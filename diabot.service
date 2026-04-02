@@ -1,0 +1,15 @@
+[Unit]
+Description=DiaBot Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=diabot
+WorkingDirectory=/opt/diabot
+ExecStart=/opt/diabot/venv/bin/python main.py
+Restart=always
+RestartSec=10
+EnvironmentFile=/opt/diabot/.env
+
+[Install]
+WantedBy=multi-user.target
