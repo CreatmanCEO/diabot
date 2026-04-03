@@ -106,12 +106,6 @@ def main() -> None:
         .build()
     )
 
-    # Store services in bot_data for handler access
-    app.bot_data["db"] = db
-    app.bot_data["llm"] = llm
-    app.bot_data["auth"] = auth
-    app.bot_data["settings"] = settings
-
     # --- Conversation Handler ---
     # Entry points include text/photo so the bot works even without /start
     # (e.g., after restart when persistence fails or for returning users)
@@ -211,11 +205,16 @@ def main() -> None:
 
     # --- Lifecycle hooks ---
     async def post_init(application: Application) -> None:
-        """Initialize database on startup."""
+        """Initialize database and inject services after persistence restore."""
         db_dir = os.path.dirname(settings.db_path)
         if db_dir:
             os.makedirs(db_dir, exist_ok=True)
         await db.init()
+        # Inject services into bot_data AFTER persistence restores it
+        application.bot_data["db"] = db
+        application.bot_data["llm"] = llm
+        application.bot_data["auth"] = auth
+        application.bot_data["settings"] = settings
         logger.info("DiaBot started. Admins: %s", settings.admin_ids)
 
     async def post_shutdown(application: Application) -> None:
