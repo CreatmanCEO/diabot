@@ -93,8 +93,18 @@ def main() -> None:
         rate_limit_window=settings.rate_limit_window,
     )
 
-    # Build application
-    app = Application.builder().token(settings.telegram_token).build()
+    # Build application with persistence
+    persistence_path = os.path.join(
+        os.path.dirname(settings.db_path) or "data", "bot_persistence.pickle"
+    )
+    from telegram.ext import PicklePersistence
+    persistence = PicklePersistence(filepath=persistence_path)
+    app = (
+        Application.builder()
+        .token(settings.telegram_token)
+        .persistence(persistence)
+        .build()
+    )
 
     # Store services in bot_data for handler access
     app.bot_data["db"] = db
@@ -172,6 +182,8 @@ def main() -> None:
             CommandHandler("start", handle_start),
         ],
         allow_reentry=True,
+        persistent=True,
+        name="diabot_conversation",
     )
 
     app.add_handler(conv_handler)
