@@ -115,6 +115,10 @@ ADMIN_USER_REMOVED = "✅ User {user_id} removed."
 ADMIN_USER_LIST = "👥 Allowed users:\n{users}"
 ADMIN_USER_LIST_EMPTY = "📭 List is empty (admins only)."
 ADMIN_ONLY = "🔒 This command is for administrators only."
+ADMIN_BTN_ADD_USER = "➕ Add user"
+ADMIN_BTN_LIST_USERS = "👥 Users"
+ADMIN_ADD_PROMPT = "Enter Telegram user ID to add:"
+ADMIN_REMOVE_PROMPT = "Enter Telegram user ID to remove:"
 
 # --- Errors ---
 SERVICE_UNAVAILABLE = "⚠️ Service temporarily unavailable, try again in a minute."

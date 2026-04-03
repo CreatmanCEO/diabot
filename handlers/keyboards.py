@@ -117,12 +117,17 @@ def targets_confirm_keyboard(locale) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-def settings_keyboard_inline(locale) -> InlineKeyboardMarkup:
-    """Inline settings action keyboard."""
+def settings_keyboard_inline(locale, is_admin: bool = False) -> InlineKeyboardMarkup:
+    """Inline settings action keyboard. Shows admin buttons for admins."""
     keyboard = [[
         InlineKeyboardButton(locale.SETTINGS_EDIT_TARGETS, callback_data="settings_targets"),
         InlineKeyboardButton(locale.SETTINGS_EDIT_PROFILE, callback_data="settings_profile"),
     ]]
+    if is_admin:
+        keyboard.append([
+            InlineKeyboardButton(locale.ADMIN_BTN_ADD_USER, callback_data="admin_adduser"),
+            InlineKeyboardButton(locale.ADMIN_BTN_LIST_USERS, callback_data="admin_listusers"),
+        ])
     return InlineKeyboardMarkup(keyboard)
 
 

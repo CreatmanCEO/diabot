@@ -10,6 +10,7 @@ from locales import get_locale
 from handlers import IDLE, ONBOARDING_GENDER, fmt
 from handlers.keyboards import settings_keyboard_inline, main_keyboard, gender_keyboard
 from services.profile import calculate_targets
+from services.auth import AuthService
 
 logger = logging.getLogger(__name__)
 
@@ -46,10 +47,13 @@ async def handle_settings(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     text = text.replace("{fat}", str(user.target_fat or "—"))
     text = text.replace("{carbs}", str(user.target_carbs or "—"))
 
+    auth: AuthService = context.bot_data["auth"]
+    is_admin = auth.is_admin(update.effective_user.id)
+
     await update.effective_message.reply_text(
         text,
         parse_mode=ParseMode.HTML,
-        reply_markup=settings_keyboard_inline(locale),
+        reply_markup=settings_keyboard_inline(locale, is_admin=is_admin),
     )
     return IDLE
 
@@ -80,6 +84,81 @@ async def handle_settings_callback(
         )
         return ONBOARDING_GENDER
 
+    return IDLE
+
+
+async def handle_admin_callback(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int:
+    """Handle admin inline button callbacks from settings."""
+    query = update.callback_query
+    await query.answer()
+
+    auth: AuthService = context.bot_data["auth"]
+    if not auth.is_admin(update.effective_user.id):
+        return IDLE
+
+    db = context.bot_data["db"]
+    user, locale = await get_user_and_locale(update, context)
+
+    if query.data == "admin_listusers":
+        await query.edit_message_reply_markup(reply_markup=None)
+        allowed = await db.get_allowed_users()
+        if not allowed:
+            await query.message.reply_text(
+                locale.ADMIN_USER_LIST_EMPTY, parse_mode=ParseMode.HTML
+            )
+        else:
+            lines = [f"• {e['user_id']} (added by {e['added_by']})" for e in allowed]
+            await query.message.reply_text(
+                locale.ADMIN_USER_LIST.format(users="\n".join(lines)),
+                parse_mode=ParseMode.HTML,
+            )
+        return IDLE
+
+    if query.data == "admin_adduser":
+        await query.edit_message_reply_markup(reply_markup=None)
+        await query.message.reply_text(
+            locale.ADMIN_ADD_PROMPT, parse_mode=ParseMode.HTML
+        )
+        context.user_data["admin_adding_user"] = True
+        return IDLE
+
+    return IDLE
+
+
+async def handle_admin_add_text(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int | None:
+    """Handle admin user ID input for adding users.
+
+    Returns None if not in admin-add mode.
+    """
+    if not context.user_data.get("admin_adding_user"):
+        return None
+
+    auth: AuthService = context.bot_data["auth"]
+    if not auth.is_admin(update.effective_user.id):
+        context.user_data.pop("admin_adding_user", None)
+        return None
+
+    db = context.bot_data["db"]
+    user, locale = await get_user_and_locale(update, context)
+
+    try:
+        target_id = int(update.message.text.strip())
+    except (ValueError, TypeError):
+        context.user_data.pop("admin_adding_user", None)
+        return None
+
+    await db.add_allowed_user(target_id, added_by=update.effective_user.id)
+    context.user_data.pop("admin_adding_user", None)
+
+    await update.message.reply_text(
+        locale.ADMIN_USER_ADDED.format(user_id=target_id),
+        parse_mode=ParseMode.HTML,
+        reply_markup=main_keyboard(locale),
+    )
     return IDLE
 
 

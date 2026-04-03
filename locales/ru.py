@@ -116,6 +116,10 @@ ADMIN_USER_REMOVED = "✅ Пользователь {user_id} удалён."
 ADMIN_USER_LIST = "👥 Разрешённые пользователи:\n{users}"
 ADMIN_USER_LIST_EMPTY = "📭 Список пуст (только админы)."
 ADMIN_ONLY = "🔒 Команда только для администраторов."
+ADMIN_BTN_ADD_USER = "➕ Добавить"
+ADMIN_BTN_LIST_USERS = "👥 Пользователи"
+ADMIN_ADD_PROMPT = "Введи Telegram ID пользователя для добавления:"
+ADMIN_REMOVE_PROMPT = "Введи Telegram ID пользователя для удаления:"
 
 # --- Errors ---
 SERVICE_UNAVAILABLE = "⚠️ Сервис временно недоступен, попробуй через минуту."

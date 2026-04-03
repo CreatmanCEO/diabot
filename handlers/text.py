@@ -12,7 +12,7 @@ from handlers.keyboards import confirm_keyboard, main_keyboard, settings_keyboar
 from handlers.diary import handle_today, handle_week, handle_history, handle_undo
 from handlers.glucose import handle_sugar_button
 from handlers.privacy import handle_privacy
-from handlers.settings import handle_settings, handle_targets_text_edit
+from handlers.settings import handle_settings, handle_targets_text_edit, handle_admin_add_text
 from services.nutrition import format_recognition
 
 logger = logging.getLogger(__name__)
@@ -85,6 +85,11 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     # Check if user is editing targets from settings
     result = await handle_targets_text_edit(update, context)
+    if result is not None:
+        return result
+
+    # Check if admin is adding a user
+    result = await handle_admin_add_text(update, context)
     if result is not None:
         return result
 
