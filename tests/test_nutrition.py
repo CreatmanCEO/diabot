@@ -102,3 +102,56 @@ def test_format_diary_day_empty():
         total_label="ИТОГО:",
     )
     assert "записей нет" in text
+
+
+from services.nutrition import format_progress_bar, format_compact_progress, format_full_progress
+
+
+def test_format_progress_bar_half():
+    bar = format_progress_bar(50, 100, width=10)
+    assert "▓" * 5 in bar
+    assert "░" * 5 in bar
+    assert "50%" in bar
+
+
+def test_format_progress_bar_zero():
+    bar = format_progress_bar(0, 100, width=10)
+    assert "0%" in bar
+    assert "░" * 10 in bar
+
+
+def test_format_progress_bar_full():
+    bar = format_progress_bar(100, 100, width=10)
+    assert "▓" * 10 in bar
+    assert "100%" in bar
+
+
+def test_format_progress_bar_over():
+    bar = format_progress_bar(150, 100, width=10)
+    assert "150%" in bar
+    assert "▓" * 10 in bar  # capped at width
+
+
+def test_format_progress_bar_no_target():
+    assert format_progress_bar(50, None) == ""
+    assert format_progress_bar(50, 0) == ""
+
+
+def test_format_compact_progress():
+    day_totals = {"calories": 440, "protein": 24, "fat": 10, "carbs": 105, "he": 8.8}
+    targets = {"calories": 1800, "protein": 65, "fat": 60, "carbs": 225}
+    text = format_compact_progress(day_totals, targets, he_target=18.8)
+    assert "🔸" in text
+    assert "🔹" in text
+    assert "105/225" in text
+    assert "8.8/18.8" in text
+
+
+def test_format_full_progress():
+    day_totals = {"calories": 739, "protein": 53.2, "fat": 9.6, "carbs": 110, "he": 8.4}
+    targets = {"calories": 1800, "protein": 65, "fat": 60, "carbs": 225}
+    text = format_full_progress(day_totals, targets, he_target=18.8)
+    assert "▓" in text
+    assert "Углеводы" in text
+    assert "ХЕ" in text
+    assert "<pre>" in text

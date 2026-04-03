@@ -166,3 +166,87 @@ def format_diary_day(
     lines.append(f"  🔸 ХЕ за день: {total_he:.1f}")
 
     return "\n".join(lines)
+
+
+def format_progress_bar(current: float, target: float | None, width: int = 15) -> str:
+    """Format a single text progress bar.
+
+    Returns empty string if target is None or <= 0.
+    """
+    if target is None or target <= 0:
+        return ""
+    pct = current / target * 100
+    filled = min(round(pct / 100 * width), width)
+    bar = "▓" * filled + "░" * (width - filled)
+    return f"{bar} {pct:.0f}%"
+
+
+def format_compact_progress(
+    day_totals: dict,
+    targets: dict,
+    he_target: float,
+) -> str:
+    """Format compact progress shown after each meal.
+
+    Line 1 (🔸): Carbs and XE (diabetes accent)
+    Line 2 (🔹): Calories, protein, fat
+    """
+    carbs = day_totals.get("carbs", 0)
+    he = day_totals.get("he", 0)
+    cal = day_totals.get("calories", 0)
+    protein = day_totals.get("protein", 0)
+    fat = day_totals.get("fat", 0)
+
+    t_carbs = targets.get("carbs") or 0
+    t_cal = targets.get("calories") or 0
+    t_protein = targets.get("protein") or 0
+    t_fat = targets.get("fat") or 0
+
+    carb_pct = round(carbs / t_carbs * 100) if t_carbs else 0
+    he_str = f"{he:.1f}/{he_target:.1f}" if he_target else f"{he:.1f}"
+    cal_pct = round(cal / t_cal * 100) if t_cal else 0
+    p_pct = round(protein / t_protein * 100) if t_protein else 0
+    f_pct = round(fat / t_fat * 100) if t_fat else 0
+
+    lines = [
+        f"🔸 У: {carbs:.0f}/{t_carbs}г ({carb_pct}%) | ХЕ: {he_str}",
+        f"🔹 К: {cal:.0f}/{t_cal} ({cal_pct}%) | Б: {protein:.0f}/{t_protein}г ({p_pct}%) | Ж: {fat:.0f}/{t_fat}г ({f_pct}%)",
+    ]
+    return "\n".join(lines)
+
+
+def format_full_progress(
+    day_totals: dict,
+    targets: dict,
+    he_target: float,
+    width: int = 15,
+) -> str:
+    """Format full progress bars for /today diary (HTML <pre> block).
+
+    Carbs and XE shown first (diabetes focus).
+    """
+    carbs = day_totals.get("carbs", 0)
+    he = day_totals.get("he", 0)
+    cal = day_totals.get("calories", 0)
+    protein = day_totals.get("protein", 0)
+    fat = day_totals.get("fat", 0)
+
+    t = targets
+    lines = []
+
+    bar = format_progress_bar(carbs, t.get("carbs"), width)
+    lines.append(f"Углеводы: {bar} ({carbs:.0f}/{t.get('carbs', 0)}г)")
+
+    bar = format_progress_bar(he, he_target, width)
+    lines.append(f"ХЕ:       {bar} ({he:.1f}/{he_target:.1f})")
+
+    bar = format_progress_bar(cal, t.get("calories"), width)
+    lines.append(f"Калории:  {bar} ({cal:.0f}/{t.get('calories', 0)})")
+
+    bar = format_progress_bar(protein, t.get("protein"), width)
+    lines.append(f"Белок:    {bar} ({protein:.0f}/{t.get('protein', 0)}г)")
+
+    bar = format_progress_bar(fat, t.get("fat"), width)
+    lines.append(f"Жиры:     {bar} ({fat:.0f}/{t.get('fat', 0)}г)")
+
+    return "<pre>" + "\n".join(lines) + "</pre>"
