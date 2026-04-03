@@ -91,7 +91,6 @@ async def handle_consent_callback(
         return ONBOARDING_TIMEZONE
 
     if query.data == "consent_details":
-        await query.answer()
         await query.edit_message_text(
             text=locale.CONSENT_DETAILS_TEXT,
             parse_mode=ParseMode.HTML,
@@ -432,6 +431,29 @@ async def handle_targets_edit_text(
         reply_markup=main_keyboard(locale),
     )
     return IDLE
+
+
+async def handle_onboarding_cancel(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> int:
+    """Handle cancel during profile editing (onboarding states).
+
+    If the user has already completed onboarding, return to IDLE.
+    Otherwise, stay in the current onboarding step.
+    """
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_reply_markup(reply_markup=None)
+    user, locale = await get_user_and_locale(update, context)
+    if user and user.onboarding_completed:
+        await query.message.reply_text(
+            locale.CANCELLED,
+            parse_mode=ParseMode.HTML,
+            reply_markup=main_keyboard(locale),
+        )
+        return IDLE
+    # If not onboarded, they can't cancel — continue onboarding
+    return ONBOARDING_GENDER
 
 
 async def handle_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

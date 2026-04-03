@@ -34,11 +34,12 @@ async def handle_today(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 
     # Migration prompt for existing users without targets
     if user and user.onboarding_completed and user.target_calories is None:
-        await update.message.reply_text(
-            fmt(locale.TARGETS_SETUP_PROMPT, update),
-            parse_mode=ParseMode.HTML,
-            reply_markup=targets_setup_keyboard(locale),
-        )
+        if not context.user_data.get("targets_prompt_dismissed"):
+            await update.message.reply_text(
+                fmt(locale.TARGETS_SETUP_PROMPT, update),
+                parse_mode=ParseMode.HTML,
+                reply_markup=targets_setup_keyboard(locale),
+            )
         # Still show diary below but without progress bars
 
     user_tz = ZoneInfo(user.timezone)
@@ -65,7 +66,7 @@ async def handle_today(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
             "carbs": user.target_carbs,
         }
         he_target = user.target_carbs / user.he_grams if user.target_carbs and user.he_grams else 0
-        text += "\n\n" + format_full_progress(day_totals, targets, he_target)
+        text += "\n\n" + format_full_progress(day_totals, targets, he_target, labels=locale.PROGRESS_LABELS_FULL)
 
     # Add glucose readings for today
     glucose_readings = await db.get_glucose_by_date(user.user_id, local_date)

@@ -85,8 +85,12 @@ async def handle_settings_callback(
 
 async def handle_targets_text_edit(
     update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> int:
-    """Handle target editing from settings (4 numbers)."""
+) -> int | None:
+    """Handle target editing from settings (4 numbers).
+
+    Returns None if not editing or input doesn't parse as targets,
+    so text.py can fall through to food recognition.
+    """
     if not context.user_data.get("editing_targets"):
         return None  # Not editing, let other handlers handle
 
@@ -99,10 +103,9 @@ async def handle_targets_text_edit(
             raise ValueError
         calories, protein, fat, carbs = int(parts[0]), int(parts[1]), int(parts[2]), int(parts[3])
     except (ValueError, TypeError):
-        await update.message.reply_text(
-            locale.ONBOARDING_TARGETS_INVALID, parse_mode=ParseMode.HTML
-        )
-        return IDLE
+        # Not valid targets input — clear flag and let food recognition handle it
+        context.user_data.pop("editing_targets", None)
+        return None
 
     await db.update_user(
         update.effective_user.id,
@@ -137,5 +140,6 @@ async def handle_targets_setup_callback(
         return ONBOARDING_GENDER
 
     # targets_setup_later
+    context.user_data["targets_prompt_dismissed"] = True
     await query.edit_message_reply_markup(reply_markup=None)
     return IDLE

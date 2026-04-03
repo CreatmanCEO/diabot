@@ -185,12 +185,16 @@ def format_compact_progress(
     day_totals: dict,
     targets: dict,
     he_target: float,
+    labels: dict | None = None,
 ) -> str:
     """Format compact progress shown after each meal.
 
     Line 1 (🔸): Carbs and XE (diabetes accent)
     Line 2 (🔹): Calories, protein, fat
+
+    Labels default to Russian abbreviations if not provided.
     """
+    lb = labels or {"carbs": "У", "cal": "К", "protein": "Б", "fat": "Ж", "xe": "ХЕ", "g": "г"}
     carbs = day_totals.get("carbs", 0)
     he = day_totals.get("he", 0)
     cal = day_totals.get("calories", 0)
@@ -208,9 +212,10 @@ def format_compact_progress(
     p_pct = round(protein / t_protein * 100) if t_protein else 0
     f_pct = round(fat / t_fat * 100) if t_fat else 0
 
+    g = lb.get("g", "г")
     lines = [
-        f"🔸 У: {carbs:.0f}/{t_carbs}г ({carb_pct}%) | ХЕ: {he_str}",
-        f"🔹 К: {cal:.0f}/{t_cal} ({cal_pct}%) | Б: {protein:.0f}/{t_protein}г ({p_pct}%) | Ж: {fat:.0f}/{t_fat}г ({f_pct}%)",
+        f"🔸 {lb['carbs']}: {carbs:.0f}/{t_carbs}{g} ({carb_pct}%) | {lb['xe']}: {he_str}",
+        f"🔹 {lb['cal']}: {cal:.0f}/{t_cal} ({cal_pct}%) | {lb['protein']}: {protein:.0f}/{t_protein}{g} ({p_pct}%) | {lb['fat']}: {fat:.0f}/{t_fat}{g} ({f_pct}%)",
     ]
     return "\n".join(lines)
 
@@ -220,33 +225,40 @@ def format_full_progress(
     targets: dict,
     he_target: float,
     width: int = 15,
+    labels: dict | None = None,
 ) -> str:
     """Format full progress bars for /today diary (HTML <pre> block).
 
     Carbs and XE shown first (diabetes focus).
+    Labels default to Russian if not provided.
     """
+    lb = labels or {"carbs": "Углеводы", "xe": "ХЕ", "cal": "Калории", "protein": "Белок", "fat": "Жиры", "g": "г"}
     carbs = day_totals.get("carbs", 0)
     he = day_totals.get("he", 0)
     cal = day_totals.get("calories", 0)
     protein = day_totals.get("protein", 0)
     fat = day_totals.get("fat", 0)
 
+    g = lb.get("g", "г")
     t = targets
     lines = []
 
+    # Pad labels to align progress bars
+    max_label_len = max(len(lb["carbs"]), len(lb["xe"]), len(lb["cal"]), len(lb["protein"]), len(lb["fat"]))
+
     bar = format_progress_bar(carbs, t.get("carbs"), width)
-    lines.append(f"Углеводы: {bar} ({carbs:.0f}/{t.get('carbs', 0)}г)")
+    lines.append(f"{lb['carbs']:<{max_label_len}}: {bar} ({carbs:.0f}/{t.get('carbs', 0)}{g})")
 
     bar = format_progress_bar(he, he_target, width)
-    lines.append(f"ХЕ:       {bar} ({he:.1f}/{he_target:.1f})")
+    lines.append(f"{lb['xe']:<{max_label_len}}: {bar} ({he:.1f}/{he_target:.1f})")
 
     bar = format_progress_bar(cal, t.get("calories"), width)
-    lines.append(f"Калории:  {bar} ({cal:.0f}/{t.get('calories', 0)})")
+    lines.append(f"{lb['cal']:<{max_label_len}}: {bar} ({cal:.0f}/{t.get('calories', 0)})")
 
     bar = format_progress_bar(protein, t.get("protein"), width)
-    lines.append(f"Белок:    {bar} ({protein:.0f}/{t.get('protein', 0)}г)")
+    lines.append(f"{lb['protein']:<{max_label_len}}: {bar} ({protein:.0f}/{t.get('protein', 0)}{g})")
 
     bar = format_progress_bar(fat, t.get("fat"), width)
-    lines.append(f"Жиры:     {bar} ({fat:.0f}/{t.get('fat', 0)}г)")
+    lines.append(f"{lb['fat']:<{max_label_len}}: {bar} ({fat:.0f}/{t.get('fat', 0)}{g})")
 
     return "<pre>" + "\n".join(lines) + "</pre>"

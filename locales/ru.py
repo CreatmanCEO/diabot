@@ -300,3 +300,7 @@ TARGETS_SETUP_PROMPT = (
 )
 TARGETS_SETUP_NOW = "📏 Настроить"
 TARGETS_SETUP_LATER = "⏭ Потом"
+
+# --- Progress labels ---
+PROGRESS_LABELS_COMPACT = {"carbs": "У", "cal": "К", "protein": "Б", "fat": "Ж", "xe": "ХЕ", "g": "г"}
+PROGRESS_LABELS_FULL = {"carbs": "Углеводы", "xe": "ХЕ", "cal": "Калории", "protein": "Белок", "fat": "Жиры", "g": "г"}

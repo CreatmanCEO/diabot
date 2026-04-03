@@ -137,7 +137,7 @@ async def handle_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             "carbs": user.target_carbs,
         }
         he_target = user.target_carbs / user.he_grams if user.target_carbs and user.he_grams else 0
-        progress_text = "\n" + format_compact_progress(day_totals, targets, he_target)
+        progress_text = "\n" + format_compact_progress(day_totals, targets, he_target, labels=locale.PROGRESS_LABELS_COMPACT)
 
     text = (
         f"{locale.CALCULATION_HEADER}\n\n"

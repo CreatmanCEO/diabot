@@ -42,6 +42,7 @@ from handlers.start import (
     handle_age_text,
     handle_targets_confirm_callback,
     handle_targets_edit_text,
+    handle_onboarding_cancel,
 )
 from handlers.photo import handle_photo
 from handlers.text import handle_text
@@ -55,7 +56,7 @@ from handlers.privacy import (
     handle_delete_data,
     handle_delete_confirm,
 )
-from handlers.settings import handle_settings_callback, handle_targets_setup_callback
+from handlers.settings import handle_settings, handle_settings_callback, handle_targets_setup_callback
 from services.database import Database
 from services.llm import LLMService
 from services.auth import AuthService
@@ -122,20 +123,24 @@ def main() -> None:
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_he_text),
             ],
             ONBOARDING_GENDER: [
+                CallbackQueryHandler(handle_onboarding_cancel, pattern="^onboarding_cancel$"),
                 CallbackQueryHandler(handle_gender_callback, pattern="^gender_"),
             ],
             ONBOARDING_HEIGHT: [
+                CallbackQueryHandler(handle_onboarding_cancel, pattern="^onboarding_cancel$"),
                 CallbackQueryHandler(handle_height_callback, pattern="^height_"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_height_text),
             ],
             ONBOARDING_WEIGHT: [
+                CallbackQueryHandler(handle_onboarding_cancel, pattern="^onboarding_cancel$"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_weight_text),
             ],
             ONBOARDING_AGE: [
+                CallbackQueryHandler(handle_onboarding_cancel, pattern="^onboarding_cancel$"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_age_text),
             ],
             ONBOARDING_TARGETS_CONFIRM: [
-                CallbackQueryHandler(handle_targets_confirm_callback, pattern="^targets_"),
+                CallbackQueryHandler(handle_targets_confirm_callback, pattern="^targets_(confirm|edit)$"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_targets_edit_text),
             ],
             # Main idle state
@@ -148,6 +153,7 @@ def main() -> None:
                 CommandHandler("undo", handle_undo),
                 CommandHandler("sugar", handle_sugar_button),
                 CommandHandler("help", handle_help),
+                CommandHandler("settings", handle_settings),
                 CommandHandler("privacy", handle_privacy),
                 CommandHandler("export", handle_export),
                 CommandHandler("delete_my_data", handle_delete_data),

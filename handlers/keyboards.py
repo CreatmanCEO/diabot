@@ -81,10 +81,13 @@ def delete_confirm_keyboard(locale) -> InlineKeyboardMarkup:
 
 def gender_keyboard(locale) -> InlineKeyboardMarkup:
     """Inline gender selection keyboard."""
-    keyboard = [[
-        InlineKeyboardButton(locale.GENDER_FEMALE, callback_data="gender_female"),
-        InlineKeyboardButton(locale.GENDER_MALE, callback_data="gender_male"),
-    ]]
+    keyboard = [
+        [
+            InlineKeyboardButton(locale.GENDER_FEMALE, callback_data="gender_female"),
+            InlineKeyboardButton(locale.GENDER_MALE, callback_data="gender_male"),
+        ],
+        [InlineKeyboardButton(locale.BTN_CANCEL, callback_data="onboarding_cancel")],
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 

@@ -299,3 +299,7 @@ TARGETS_SETUP_PROMPT = (
 )
 TARGETS_SETUP_NOW = "📏 Set up"
 TARGETS_SETUP_LATER = "⏭ Later"
+
+# --- Progress labels ---
+PROGRESS_LABELS_COMPACT = {"carbs": "C", "cal": "Cal", "protein": "P", "fat": "F", "xe": "XE", "g": "g"}
+PROGRESS_LABELS_FULL = {"carbs": "Carbs", "xe": "XE", "cal": "Calories", "protein": "Protein", "fat": "Fat", "g": "g"}
