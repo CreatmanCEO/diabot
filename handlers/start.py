@@ -1,4 +1,4 @@
-"""Onboarding flow: /start -> consent -> timezone -> HE -> gender -> height -> weight -> age -> targets -> complete."""
+"""Onboarding flow: /start -> consent -> gender -> height -> weight -> age -> targets -> complete."""
 
 import logging
 from zoneinfo import ZoneInfo
@@ -29,6 +29,7 @@ from handlers.keyboards import (
     height_keyboard,
     targets_confirm_keyboard,
 )
+# Note: timezone_keyboard and he_keyboard are still imported for /settings use
 from services.profile import calculate_targets
 
 logger = logging.getLogger(__name__)
@@ -84,11 +85,11 @@ async def handle_consent_callback(
     if query.data == "consent_agree":
         await query.edit_message_reply_markup(reply_markup=None)
         await query.message.reply_text(
-            locale.ONBOARDING_TIMEZONE,
+            fmt(locale.ONBOARDING_GENDER, update),
             parse_mode=ParseMode.HTML,
-            reply_markup=timezone_keyboard(locale),
+            reply_markup=gender_keyboard(locale),
         )
-        return ONBOARDING_TIMEZONE
+        return ONBOARDING_GENDER
 
     if query.data == "consent_details":
         await query.edit_message_text(
@@ -351,7 +352,8 @@ async def handle_age_text(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         target_carbs=targets["carbs"],
     )
 
-    he_target = round(targets["carbs"] / user.he_grams, 1) if user.he_grams else 0
+    he_grams = user.he_grams or context.bot_data["settings"].default_he_grams
+    he_target = round(targets["carbs"] / he_grams, 1)
     text = fmt(
         locale.ONBOARDING_TARGETS_SHOW, update,
         calories=targets["calories"], protein=targets["protein"],
@@ -381,7 +383,13 @@ async def handle_targets_confirm_callback(
         )
         return ONBOARDING_TARGETS_CONFIRM
 
-    # targets_confirm
+    # targets_confirm — set defaults for tz/HE skipped in onboarding
+    settings = context.bot_data["settings"]
+    await db.update_user(
+        update.effective_user.id,
+        timezone=settings.default_timezone,
+        he_grams=settings.default_he_grams,
+    )
     await db.complete_onboarding(update.effective_user.id)
     user = await db.get_user(update.effective_user.id)
     locale = get_locale(user.language if user else "ru")
@@ -415,10 +423,14 @@ async def handle_targets_edit_text(
         )
         return ONBOARDING_TARGETS_CONFIRM
 
+    # Set targets and defaults for tz/HE skipped in onboarding
+    settings = context.bot_data["settings"]
     await db.update_user(
         update.effective_user.id,
         target_calories=calories, target_protein=protein,
         target_fat=fat, target_carbs=carbs,
+        timezone=settings.default_timezone,
+        he_grams=settings.default_he_grams,
     )
     await db.complete_onboarding(update.effective_user.id)
 

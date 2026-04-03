@@ -16,8 +16,6 @@ from telegram.ext import (
 from config import load_settings
 from handlers import (
     ONBOARDING_CONSENT,
-    ONBOARDING_TIMEZONE,
-    ONBOARDING_HE,
     ONBOARDING_GENDER,
     ONBOARDING_HEIGHT,
     ONBOARDING_WEIGHT,
@@ -30,10 +28,6 @@ from handlers import (
 from handlers.start import (
     handle_start,
     handle_consent_callback,
-    handle_timezone_callback,
-    handle_timezone_text,
-    handle_he_callback,
-    handle_he_text,
     handle_help,
     handle_gender_callback,
     handle_height_callback,
@@ -117,14 +111,6 @@ def main() -> None:
             # Onboarding flow
             ONBOARDING_CONSENT: [
                 CallbackQueryHandler(handle_consent_callback, pattern="^consent_"),
-            ],
-            ONBOARDING_TIMEZONE: [
-                CallbackQueryHandler(handle_timezone_callback, pattern="^tz_"),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_timezone_text),
-            ],
-            ONBOARDING_HE: [
-                CallbackQueryHandler(handle_he_callback, pattern="^he_"),
-                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_he_text),
             ],
             ONBOARDING_GENDER: [
                 CallbackQueryHandler(handle_onboarding_cancel, pattern="^onboarding_cancel$"),
