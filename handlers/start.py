@@ -46,10 +46,17 @@ async def get_user_and_locale(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Handle /start command — begin onboarding or show help."""
+    """Handle /start command — check access, then onboard or show help."""
     db = context.bot_data["db"]
+    auth = context.bot_data["auth"]
     tg_user = update.effective_user
     user = await db.get_user(tg_user.id)
+
+    # Check if user has access (admins always do)
+    if not await auth.is_allowed(tg_user.id):
+        from handlers.access import handle_access_denied
+        await handle_access_denied(update, context)
+        return IDLE
 
     if user and user.onboarding_completed:
         locale = get_locale(user.language)
@@ -60,7 +67,7 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
         )
         return IDLE
 
-    # New user — create record and start onboarding
+    # Allowed user — create record and start onboarding
     if not user:
         await db.create_user(tg_user.id, username=tg_user.username)
 

@@ -48,6 +48,7 @@ async def handle_settings(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     text = text.replace("{carbs}", str(user.target_carbs or "—"))
 
     auth: AuthService = context.bot_data["auth"]
+    db = context.bot_data["db"]
     is_admin = auth.is_admin(update.effective_user.id)
 
     pending_count = 0
