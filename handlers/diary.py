@@ -11,7 +11,7 @@ from telegram.ext import ContextTypes
 
 from locales import get_locale
 from handlers import IDLE, fmt
-from handlers.keyboards import main_keyboard
+from handlers.keyboards import main_keyboard, targets_setup_keyboard
 from services.nutrition import format_diary_day, format_diary_entry, format_full_progress
 
 logger = logging.getLogger(__name__)
@@ -31,6 +31,15 @@ async def handle_today(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     """Show diary for today."""
     user, locale = await get_user_and_locale(update, context)
     db = context.bot_data["db"]
+
+    # Migration prompt for existing users without targets
+    if user and user.onboarding_completed and user.target_calories is None:
+        await update.message.reply_text(
+            fmt(locale.TARGETS_SETUP_PROMPT, update),
+            parse_mode=ParseMode.HTML,
+            reply_markup=targets_setup_keyboard(locale),
+        )
+        # Still show diary below but without progress bars
 
     user_tz = ZoneInfo(user.timezone)
     now = datetime.now(user_tz)
