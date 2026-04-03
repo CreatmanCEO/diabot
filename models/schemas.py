@@ -88,3 +88,11 @@ class User:
     onboarding_completed: bool = False
     consent_given_at: str | None = None
     created_at: str | None = None
+    gender: str | None = None
+    height_cm: int | None = None
+    weight_kg: float | None = None
+    age: int | None = None
+    target_calories: int | None = None
+    target_protein: int | None = None
+    target_fat: int | None = None
+    target_carbs: int | None = None
