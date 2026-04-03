@@ -28,10 +28,8 @@ async def check_access(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bo
     """Check if user is allowed to use the bot."""
     auth = context.bot_data["auth"]
     if not await auth.is_allowed(update.effective_user.id):
-        locale = get_locale(context.bot_data["settings"].default_language)
-        await update.effective_message.reply_text(
-            locale.ACCESS_DENIED, parse_mode=ParseMode.HTML
-        )
+        from handlers.access import handle_access_denied
+        await handle_access_denied(update, context)
         return False
     return True
 

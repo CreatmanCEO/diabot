@@ -117,17 +117,38 @@ def targets_confirm_keyboard(locale) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
-def settings_keyboard_inline(locale, is_admin: bool = False) -> InlineKeyboardMarkup:
+def access_request_keyboard(locale) -> InlineKeyboardMarkup:
+    """Keyboard for unauthorized users to request access."""
+    keyboard = [[
+        InlineKeyboardButton(locale.ACCESS_REQUEST_BTN, callback_data="access_request"),
+    ]]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def admin_review_keyboard(locale, request_id: int) -> InlineKeyboardMarkup:
+    """Admin keyboard to approve/reject a request."""
+    keyboard = [[
+        InlineKeyboardButton(locale.ADMIN_APPROVE, callback_data=f"review_approve_{request_id}"),
+        InlineKeyboardButton(locale.ADMIN_REJECT, callback_data=f"review_reject_{request_id}"),
+    ]]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def settings_keyboard_inline(locale, is_admin: bool = False, pending_count: int = 0) -> InlineKeyboardMarkup:
     """Inline settings action keyboard. Shows admin buttons for admins."""
     keyboard = [[
         InlineKeyboardButton(locale.SETTINGS_EDIT_TARGETS, callback_data="settings_targets"),
         InlineKeyboardButton(locale.SETTINGS_EDIT_PROFILE, callback_data="settings_profile"),
     ]]
     if is_admin:
-        keyboard.append([
-            InlineKeyboardButton(locale.ADMIN_BTN_ADD_USER, callback_data="admin_adduser"),
-            InlineKeyboardButton(locale.ADMIN_BTN_LIST_USERS, callback_data="admin_listusers"),
-        ])
+        admin_row = []
+        if pending_count > 0:
+            admin_row.append(InlineKeyboardButton(
+                locale.ADMIN_BTN_PENDING.format(count=pending_count),
+                callback_data="admin_pending",
+            ))
+        admin_row.append(InlineKeyboardButton(locale.ADMIN_BTN_LIST_USERS, callback_data="admin_listusers"))
+        keyboard.append(admin_row)
     return InlineKeyboardMarkup(keyboard)
 
 

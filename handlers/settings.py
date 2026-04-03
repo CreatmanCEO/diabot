@@ -50,10 +50,15 @@ async def handle_settings(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     auth: AuthService = context.bot_data["auth"]
     is_admin = auth.is_admin(update.effective_user.id)
 
+    pending_count = 0
+    if is_admin:
+        pending = await db.get_pending_requests()
+        pending_count = len(pending)
+
     await update.effective_message.reply_text(
         text,
         parse_mode=ParseMode.HTML,
-        reply_markup=settings_keyboard_inline(locale, is_admin=is_admin),
+        reply_markup=settings_keyboard_inline(locale, is_admin=is_admin, pending_count=pending_count),
     )
     return IDLE
 
@@ -109,11 +114,36 @@ async def handle_admin_callback(
                 locale.ADMIN_USER_LIST_EMPTY, parse_mode=ParseMode.HTML
             )
         else:
-            lines = [f"• {e['user_id']} (added by {e['added_by']})" for e in allowed]
+            lines = []
+            for e in allowed:
+                u = await db.get_user(e["user_id"])
+                name = u.username if u and u.username else str(e["user_id"])
+                lines.append(f"\u2022 {name} (ID: {e['user_id']})")
             await query.message.reply_text(
-                locale.ADMIN_USER_LIST.format(users="\n".join(lines)),
+                locale.ADMIN_USERS_HEADER + "\n".join(lines),
                 parse_mode=ParseMode.HTML,
             )
+        return IDLE
+
+    if query.data == "admin_pending":
+        await query.edit_message_reply_markup(reply_markup=None)
+        pending = await db.get_pending_requests()
+        if not pending:
+            await query.message.reply_text(
+                locale.ADMIN_PENDING_EMPTY, parse_mode=ParseMode.HTML
+            )
+        else:
+            from handlers.keyboards import admin_review_keyboard
+            for req in pending:
+                text = locale.ADMIN_NEW_REQUEST.format(
+                    first_name=req.get("first_name") or "\u2014",
+                    username=req.get("username") or "\u2014",
+                    user_id=str(req["user_id"]),
+                )
+                await query.message.reply_text(
+                    text, parse_mode=ParseMode.HTML,
+                    reply_markup=admin_review_keyboard(locale, req["id"]),
+                )
         return IDLE
 
     if query.data == "admin_adduser":

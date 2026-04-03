@@ -60,6 +60,7 @@ from handlers.settings import (
     handle_settings, handle_settings_callback,
     handle_targets_setup_callback, handle_admin_callback,
 )
+from handlers.access import handle_access_request_callback, handle_review_callback
 from services.database import Database
 from services.llm import LLMService
 from services.auth import AuthService
@@ -188,6 +189,10 @@ def main() -> None:
     )
 
     app.add_handler(conv_handler)
+
+    # Standalone handlers for callbacks that may arrive outside conversation context
+    app.add_handler(CallbackQueryHandler(handle_review_callback, pattern=r"^review_(approve|reject)_\d+$"))
+    app.add_handler(CallbackQueryHandler(handle_access_request_callback, pattern=r"^access_request$"))
 
     # --- Lifecycle hooks ---
     async def post_init(application: Application) -> None:

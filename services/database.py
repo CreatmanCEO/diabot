@@ -80,6 +80,18 @@ class Database:
                 added_by INTEGER NOT NULL,
                 added_at TEXT DEFAULT (datetime('now'))
             );
+
+            CREATE TABLE IF NOT EXISTS access_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                username TEXT,
+                first_name TEXT,
+                status TEXT DEFAULT 'pending',
+                requested_at TEXT DEFAULT (datetime('now')),
+                reviewed_by INTEGER,
+                reviewed_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_access_requests_status ON access_requests(status);
         """)
         await self._db.commit()
 
@@ -102,6 +114,21 @@ class Database:
                 )
             except Exception:
                 pass  # Column already exists
+
+        # Ensure access_requests table exists (migration for existing DBs)
+        await self._db.executescript("""
+            CREATE TABLE IF NOT EXISTS access_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                username TEXT,
+                first_name TEXT,
+                status TEXT DEFAULT 'pending',
+                requested_at TEXT DEFAULT (datetime('now')),
+                reviewed_by INTEGER,
+                reviewed_at TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_access_requests_status ON access_requests(status);
+        """)
         await self._db.commit()
 
     # --- Users ---
@@ -292,6 +319,75 @@ class Database:
         )
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
+
+    # --- Access Requests ---
+
+    async def create_access_request(self, user_id: int, username: str | None, first_name: str | None) -> int:
+        """Create a pending access request. Returns request ID."""
+        cursor = await self._db.execute(
+            "SELECT id FROM access_requests WHERE user_id = ? AND status = 'pending'",
+            (user_id,)
+        )
+        existing = await cursor.fetchone()
+        if existing:
+            return existing["id"]
+        cursor = await self._db.execute(
+            "INSERT INTO access_requests (user_id, username, first_name) VALUES (?, ?, ?)",
+            (user_id, username, first_name),
+        )
+        await self._db.commit()
+        return cursor.lastrowid
+
+    async def get_pending_requests(self) -> list[dict]:
+        """Get all pending access requests."""
+        cursor = await self._db.execute(
+            "SELECT * FROM access_requests WHERE status = 'pending' ORDER BY requested_at"
+        )
+        rows = await cursor.fetchall()
+        return [dict(row) for row in rows]
+
+    async def approve_request(self, request_id: int, reviewed_by: int) -> dict | None:
+        """Approve an access request. Returns the request dict or None."""
+        cursor = await self._db.execute(
+            "SELECT * FROM access_requests WHERE id = ? AND status = 'pending'",
+            (request_id,)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        request = dict(row)
+        await self._db.execute(
+            "UPDATE access_requests SET status = 'approved', reviewed_by = ?, reviewed_at = datetime('now') WHERE id = ?",
+            (reviewed_by, request_id),
+        )
+        await self.add_allowed_user(request["user_id"], added_by=reviewed_by)
+        await self._db.commit()
+        return request
+
+    async def reject_request(self, request_id: int, reviewed_by: int) -> dict | None:
+        """Reject an access request. Returns the request dict or None."""
+        cursor = await self._db.execute(
+            "SELECT * FROM access_requests WHERE id = ? AND status = 'pending'",
+            (request_id,)
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return None
+        request = dict(row)
+        await self._db.execute(
+            "UPDATE access_requests SET status = 'rejected', reviewed_by = ?, reviewed_at = datetime('now') WHERE id = ?",
+            (reviewed_by, request_id),
+        )
+        await self._db.commit()
+        return request
+
+    async def has_pending_request(self, user_id: int) -> bool:
+        """Check if user has a pending request."""
+        cursor = await self._db.execute(
+            "SELECT 1 FROM access_requests WHERE user_id = ? AND status = 'pending'",
+            (user_id,)
+        )
+        return await cursor.fetchone() is not None
 
     # --- Data Management ---
 

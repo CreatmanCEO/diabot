@@ -120,6 +120,33 @@ ADMIN_BTN_LIST_USERS = "👥 Users"
 ADMIN_ADD_PROMPT = "Enter Telegram user ID to add:"
 ADMIN_REMOVE_PROMPT = "Enter Telegram user ID to remove:"
 
+# --- Access requests ---
+ACCESS_REQUEST_WELCOME = (
+    "👋 Hi, {name}! I'm <b>DiaBot</b> — a helper for counting "
+    "carbs and calories from food photos.\n\n"
+    "This is a personal bot. You need admin approval to use it."
+)
+ACCESS_REQUEST_BTN = "📨 Request access"
+ACCESS_REQUEST_SENT = "📨 Request sent! The admin will review it shortly."
+ACCESS_REQUEST_PENDING = "⏳ Your request is already pending. Please wait for admin approval."
+ACCESS_REQUEST_APPROVED = "🎉 {name}, your request has been approved! Type /start to begin."
+ACCESS_REQUEST_REJECTED = "😔 Unfortunately, your request has been declined."
+ADMIN_NEW_REQUEST = (
+    "📨 <b>New access request</b>\n\n"
+    "👤 Name: {first_name}\n"
+    "📝 Username: @{username}\n"
+    "🆔 ID: <code>{user_id}</code>"
+)
+ADMIN_APPROVE = "✅ Approve"
+ADMIN_REJECT = "❌ Reject"
+ADMIN_REQUEST_APPROVED = "✅ Request from {first_name} (ID: {user_id}) approved."
+ADMIN_REQUEST_REJECTED = "❌ Request from {first_name} (ID: {user_id}) rejected."
+ADMIN_REQUEST_ALREADY_HANDLED = "⚠️ This request has already been handled."
+ADMIN_BTN_PENDING = "📨 Requests ({count})"
+ADMIN_PENDING_HEADER = "📨 <b>Pending requests:</b>\n"
+ADMIN_PENDING_EMPTY = "📭 No pending requests."
+ADMIN_USERS_HEADER = "👥 <b>Users with access:</b>\n"
+
 # --- Errors ---
 SERVICE_UNAVAILABLE = "⚠️ Service temporarily unavailable, try again in a minute."
 RATE_LIMITED = "⏳ Too many requests. Try again in {minutes} min."

@@ -121,6 +121,33 @@ ADMIN_BTN_LIST_USERS = "👥 Пользователи"
 ADMIN_ADD_PROMPT = "Введи Telegram ID пользователя для добавления:"
 ADMIN_REMOVE_PROMPT = "Введи Telegram ID пользователя для удаления:"
 
+# --- Access requests ---
+ACCESS_REQUEST_WELCOME = (
+    "👋 Привет, {name}! Я <b>DiaBot</b> — помощник для подсчёта "
+    "углеводов и КБЖУ по фото еды.\n\n"
+    "Этот бот персональный. Для доступа нужно одобрение администратора."
+)
+ACCESS_REQUEST_BTN = "📨 Запросить доступ"
+ACCESS_REQUEST_SENT = "📨 Заявка отправлена! Администратор рассмотрит её в ближайшее время."
+ACCESS_REQUEST_PENDING = "⏳ Твоя заявка уже отправлена. Ожидай ответа администратора."
+ACCESS_REQUEST_APPROVED = "🎉 {name}, твоя заявка одобрена! Напиши /start чтобы начать."
+ACCESS_REQUEST_REJECTED = "😔 К сожалению, твоя заявка отклонена."
+ADMIN_NEW_REQUEST = (
+    "📨 <b>Новая заявка на доступ</b>\n\n"
+    "👤 Имя: {first_name}\n"
+    "📝 Username: @{username}\n"
+    "🆔 ID: <code>{user_id}</code>"
+)
+ADMIN_APPROVE = "✅ Одобрить"
+ADMIN_REJECT = "❌ Отклонить"
+ADMIN_REQUEST_APPROVED = "✅ Заявка пользователя {first_name} (ID: {user_id}) одобрена."
+ADMIN_REQUEST_REJECTED = "❌ Заявка пользователя {first_name} (ID: {user_id}) отклонена."
+ADMIN_REQUEST_ALREADY_HANDLED = "⚠️ Эта заявка уже рассмотрена."
+ADMIN_BTN_PENDING = "📨 Заявки ({count})"
+ADMIN_PENDING_HEADER = "📨 <b>Нерассмотренные заявки:</b>\n"
+ADMIN_PENDING_EMPTY = "📭 Нет нерассмотренных заявок."
+ADMIN_USERS_HEADER = "👥 <b>Пользователи с доступом:</b>\n"
+
 # --- Errors ---
 SERVICE_UNAVAILABLE = "⚠️ Сервис временно недоступен, попробуй через минуту."
 RATE_LIMITED = "⏳ Слишком много запросов. Попробуй через {minutes} мин."
