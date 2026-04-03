@@ -12,7 +12,7 @@ from telegram.ext import ContextTypes
 from locales import get_locale
 from handlers import IDLE, fmt
 from handlers.keyboards import main_keyboard
-from services.nutrition import format_diary_day, format_diary_entry
+from services.nutrition import format_diary_day, format_diary_entry, format_full_progress
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +45,18 @@ async def handle_today(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
         empty_template=locale.DIARY_EMPTY,
         total_label=locale.DIARY_TOTAL,
     )
+
+    # Add progress bars if user has targets
+    if user.target_calories:
+        day_totals = await db.get_day_totals(user.user_id, local_date)
+        targets = {
+            "calories": user.target_calories,
+            "protein": user.target_protein,
+            "fat": user.target_fat,
+            "carbs": user.target_carbs,
+        }
+        he_target = user.target_carbs / user.he_grams if user.target_carbs and user.he_grams else 0
+        text += "\n\n" + format_full_progress(day_totals, targets, he_target)
 
     # Add glucose readings for today
     glucose_readings = await db.get_glucose_by_date(user.user_id, local_date)
