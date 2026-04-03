@@ -113,9 +113,26 @@ def main() -> None:
     app.bot_data["settings"] = settings
 
     # --- Conversation Handler ---
+    # Entry points include text/photo so the bot works even without /start
+    # (e.g., after restart when persistence fails or for returning users)
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler("start", handle_start),
+            MessageHandler(filters.PHOTO, handle_photo),
+            MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text),
+            CommandHandler("today", handle_today),
+            CommandHandler("week", handle_week),
+            CommandHandler("history", handle_history),
+            CommandHandler("undo", handle_undo),
+            CommandHandler("sugar", handle_sugar_button),
+            CommandHandler("help", handle_help),
+            CommandHandler("settings", handle_settings),
+            CommandHandler("privacy", handle_privacy),
+            CommandHandler("export", handle_export),
+            CommandHandler("delete_my_data", handle_delete_data),
+            CommandHandler("adduser", handle_adduser),
+            CommandHandler("removeuser", handle_removeuser),
+            CommandHandler("listusers", handle_listusers),
         ],
         states={
             # Onboarding flow
