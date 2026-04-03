@@ -18,6 +18,7 @@ from services.nutrition import (
     format_calculation,
     format_calculation_summary,
     format_daily_summary,
+    format_compact_progress,
 )
 
 logger = logging.getLogger(__name__)
@@ -125,12 +126,26 @@ async def handle_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         day_calories, day_he, locale.CALCULATION_TODAY_SUMMARY
     )
 
+    # Compact progress bars if user has targets set
+    progress_text = ""
+    if user.target_calories:
+        day_totals = await db.get_day_totals(user.user_id, local_date)
+        targets = {
+            "calories": user.target_calories,
+            "protein": user.target_protein,
+            "fat": user.target_fat,
+            "carbs": user.target_carbs,
+        }
+        he_target = user.target_carbs / user.he_grams if user.target_carbs and user.he_grams else 0
+        progress_text = "\n" + format_compact_progress(day_totals, targets, he_target)
+
     text = (
         f"{locale.CALCULATION_HEADER}\n\n"
         f"{table}\n\n"
         f"{summary}\n\n"
         f"{fmt(locale.CALCULATION_SAVED, update)}\n"
         f"{daily_summary}"
+        f"{progress_text}"
     )
 
     await query.message.reply_text(
