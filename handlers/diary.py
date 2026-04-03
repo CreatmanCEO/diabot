@@ -10,7 +10,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from locales import get_locale
-from handlers import IDLE
+from handlers import IDLE, fmt
 from handlers.keyboards import main_keyboard
 from services.nutrition import format_diary_day, format_diary_entry
 
@@ -165,7 +165,7 @@ async def handle_undo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     deleted = await db.delete_last_meal(user.user_id)
 
-    text = locale.UNDO_SUCCESS if deleted else locale.UNDO_NOTHING
+    text = fmt(locale.UNDO_SUCCESS, update) if deleted else fmt(locale.UNDO_NOTHING, update)
     await update.message.reply_text(
         text,
         parse_mode=ParseMode.HTML,

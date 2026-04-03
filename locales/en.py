@@ -5,10 +5,10 @@ LANG_NAME = "English"
 
 # --- Onboarding ---
 START_WELCOME = (
-    "👋 Hi! I'm <b>DiaBot</b> — your assistant for counting "
-    "carbs and calories from food photos.\n\n"
-    "I'm built for people with type 1 diabetes.\n"
-    "Send a food photo — I'll recognize the items "
+    "👋 Hi, {name}! I'm <b>DiaBot</b> — your personal assistant "
+    "for counting carbs and calories from food photos.\n\n"
+    "I'm here to help you keep track of your meals — "
+    "just send a food photo and I'll recognize the items "
     "and calculate carbs and bread units.\n\n"
     "⚠️ I'm not a medical device. Always consult "
     "your doctor about insulin dosing.\n\n"
@@ -37,7 +37,7 @@ HE_12 = "12 g (standard)"
 HE_10 = "10 g"
 HE_OTHER = "Other"
 ONBOARDING_COMPLETE = (
-    "✅ All set! Here's what I can do:\n\n"
+    "✅ All set, {name}! Here's what I can do:\n\n"
     "📸 Send a food photo — I'll recognize and calculate nutrition\n"
     "✏️ Or type what you ate\n"
     "💉 \"Sugar\" — log a glucose reading\n"
@@ -63,17 +63,17 @@ BTN_CONFIRM = "✅ Correct"
 BTN_CANCEL = "❌ Cancel"
 
 # --- Recognition ---
-ANALYZING = "⏳ Analyzing..."
-RECOGNITION_HEADER = "🔍 I see:"
-RECOGNITION_HEADER_TEXT = "🔍 I think:"
+ANALYZING = "⏳ One moment, {name}, let me take a look..."
+RECOGNITION_HEADER = "🔍 {name}, I see:"
+RECOGNITION_HEADER_TEXT = "🔍 {name}, I think:"
 RECOGNITION_CONFIRM = "All correct? Tap ✅ or tell me what to fix."
 RECOGNITION_UPDATED = "🔍 Updated list:"
-RECOGNITION_NO_FOOD = "🤔 I don't see food in the photo. Send a photo of a plate or describe what you ate."
+RECOGNITION_NO_FOOD = "🤔 {name}, I don't see food in the photo. Send a photo of a plate or describe what you ate."
 RECOGNITION_FAILED = "⚠️ Couldn't recognize the food, try another photo or describe it in text."
 
 # --- Calculation ---
 CALCULATION_HEADER = "🍽 Nutrition breakdown:"
-CALCULATION_SAVED = "📝 Saved!"
+CALCULATION_SAVED = "📝 Saved, {name}!"
 CALCULATION_TODAY_SUMMARY = "Today: {calories} kcal | {he} BU"
 
 # --- Diary ---
@@ -85,11 +85,11 @@ WEEK_EMPTY = "📭 No entries for the past week."
 HISTORY_HEADER = "📋 Last {n} entries:"
 HISTORY_EMPTY = "📭 No entries yet."
 UNDO_SUCCESS = "↩️ Last entry deleted."
-UNDO_NOTHING = "📭 Nothing to undo."
+UNDO_NOTHING = "📭 {name}, nothing to undo."
 
 # --- Glucose ---
-GLUCOSE_PROMPT = "💉 Enter your blood sugar reading (mmol/L):"
-GLUCOSE_SAVED = "💉 Saved: {value} mmol/L"
+GLUCOSE_PROMPT = "💉 {name}, enter your blood sugar reading (mmol/L):"
+GLUCOSE_SAVED = "💉 Saved: {value} mmol/L 👍"
 GLUCOSE_INVALID = "⚠️ Enter a number, e.g.: 5.8"
 
 # --- Privacy ---
@@ -121,11 +121,11 @@ SERVICE_UNAVAILABLE = "⚠️ Service temporarily unavailable, try again in a mi
 RATE_LIMITED = "⏳ Too many requests. Try again in {minutes} min."
 ACCESS_DENIED = "🔒 This is a personal bot. Ask the admin to add you."
 UNSUPPORTED_MESSAGE = "📸 Send a food photo or type what you ate."
-CANCELLED = "❌ Cancelled."
+CANCELLED = "❌ Cancelled. I'm here if you need me."
 
 # --- Help ---
 HELP_TEXT = (
-    "❓ <b>How to use DiaBot</b>\n\n"
+    "❓ <b>{name}, here's what I can do:</b>\n\n"
     "<b>Basics:</b>\n"
     "📸 Send a food photo — I'll recognize and calculate nutrition\n"
     "✏️ Type it out: \"pasta with chicken and salad\"\n"

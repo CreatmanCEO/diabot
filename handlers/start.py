@@ -13,6 +13,7 @@ from handlers import (
     ONBOARDING_TIMEZONE,
     ONBOARDING_HE,
     IDLE,
+    fmt,
 )
 from handlers.keyboards import (
     main_keyboard,
@@ -43,7 +44,7 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     if user and user.onboarding_completed:
         locale = get_locale(user.language)
         await update.message.reply_text(
-            locale.HELP_TEXT,
+            fmt(locale.HELP_TEXT, update),
             parse_mode=ParseMode.HTML,
             reply_markup=main_keyboard(locale),
         )
@@ -55,7 +56,7 @@ async def handle_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 
     locale = get_locale(context.bot_data["settings"].default_language)
     await update.message.reply_text(
-        locale.START_WELCOME,
+        fmt(locale.START_WELCOME, update),
         parse_mode=ParseMode.HTML,
         reply_markup=consent_keyboard(locale),
     )
@@ -186,7 +187,7 @@ async def handle_he_callback(
 
     await query.edit_message_reply_markup(reply_markup=None)
     await query.message.reply_text(
-        locale.ONBOARDING_COMPLETE,
+        fmt(locale.ONBOARDING_COMPLETE, update),
         parse_mode=ParseMode.HTML,
         reply_markup=main_keyboard(locale),
     )
@@ -218,7 +219,7 @@ async def handle_he_text(
     locale = get_locale(user.language)
 
     await update.message.reply_text(
-        locale.ONBOARDING_COMPLETE,
+        fmt(locale.ONBOARDING_COMPLETE, update),
         parse_mode=ParseMode.HTML,
         reply_markup=main_keyboard(locale),
     )
@@ -229,7 +230,7 @@ async def handle_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     """Handle /help command."""
     user, locale = await get_user_and_locale(update, context)
     await update.message.reply_text(
-        locale.HELP_TEXT,
+        fmt(locale.HELP_TEXT, update),
         parse_mode=ParseMode.HTML,
         reply_markup=main_keyboard(locale) if user and user.onboarding_completed else None,
     )

@@ -9,7 +9,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from locales import get_locale
-from handlers import IDLE
+from handlers import IDLE, fmt
 from handlers.keyboards import main_keyboard, delete_confirm_keyboard
 
 logger = logging.getLogger(__name__)

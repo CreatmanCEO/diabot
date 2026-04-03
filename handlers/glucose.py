@@ -9,7 +9,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from locales import get_locale
-from handlers import IDLE, AWAITING_GLUCOSE
+from handlers import IDLE, AWAITING_GLUCOSE, fmt
 from handlers.keyboards import main_keyboard
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ async def handle_sugar_button(
     user, locale = await get_user_and_locale(update, context)
 
     await update.message.reply_text(
-        locale.GLUCOSE_PROMPT,
+        fmt(locale.GLUCOSE_PROMPT, update),
         parse_mode=ParseMode.HTML,
     )
     return AWAITING_GLUCOSE
@@ -70,7 +70,7 @@ async def handle_glucose_value(
     )
 
     await update.message.reply_text(
-        locale.GLUCOSE_SAVED.format(value=value),
+        fmt(locale.GLUCOSE_SAVED, update, value=value),
         parse_mode=ParseMode.HTML,
         reply_markup=main_keyboard(locale),
     )

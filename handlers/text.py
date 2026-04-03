@@ -7,7 +7,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from locales import get_locale
-from handlers import IDLE, AWAITING_CONFIRM, AWAITING_GLUCOSE
+from handlers import IDLE, AWAITING_CONFIRM, AWAITING_GLUCOSE, fmt
 from handlers.keyboards import confirm_keyboard, main_keyboard, settings_keyboard
 from handlers.diary import handle_today, handle_week, handle_history, handle_undo
 from handlers.glucose import handle_sugar_button
@@ -56,7 +56,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     if text == locale.BTN_MENU:
         await update.message.reply_text(
-            locale.HELP_TEXT,
+            fmt(locale.HELP_TEXT, update),
             parse_mode=ParseMode.HTML,
             reply_markup=settings_keyboard(locale),
         )
@@ -73,7 +73,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     if text == locale.BTN_HELP:
         await update.message.reply_text(
-            locale.HELP_TEXT,
+            fmt(locale.HELP_TEXT, update),
             parse_mode=ParseMode.HTML,
             reply_markup=main_keyboard(locale),
         )
@@ -81,7 +81,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     if text == locale.BTN_BACK:
         await update.message.reply_text(
-            locale.HELP_TEXT,
+            fmt(locale.HELP_TEXT, update),
             parse_mode=ParseMode.HTML,
             reply_markup=main_keyboard(locale),
         )
@@ -99,13 +99,13 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
     if not allowed:
         minutes = max(1, wait_seconds // 60)
         await update.message.reply_text(
-            locale.RATE_LIMITED.format(minutes=minutes),
+            fmt(locale.RATE_LIMITED, update, minutes=minutes),
             parse_mode=ParseMode.HTML,
         )
         return IDLE
 
     status_msg = await update.message.reply_text(
-        locale.ANALYZING, parse_mode=ParseMode.HTML
+        fmt(locale.ANALYZING, update), parse_mode=ParseMode.HTML
     )
 
     try:
@@ -119,7 +119,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     if not result.is_food:
         await status_msg.edit_text(
-            locale.RECOGNITION_NO_FOOD, parse_mode=ParseMode.HTML
+            fmt(locale.RECOGNITION_NO_FOOD, update), parse_mode=ParseMode.HTML
         )
         return IDLE
 
@@ -135,7 +135,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
 
     formatted = format_recognition(
         result,
-        header=locale.RECOGNITION_HEADER_TEXT,
+        header=fmt(locale.RECOGNITION_HEADER_TEXT, update),
         confirm_msg=locale.RECOGNITION_CONFIRM,
         no_food_msg=locale.RECOGNITION_NO_FOOD,
     )

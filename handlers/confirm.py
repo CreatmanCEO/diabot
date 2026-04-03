@@ -10,7 +10,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from locales import get_locale
-from handlers import IDLE, AWAITING_CONFIRM
+from handlers import IDLE, AWAITING_CONFIRM, fmt
 from handlers.keyboards import confirm_keyboard, main_keyboard
 from models.schemas import RecognitionResult
 from services.nutrition import (
@@ -57,7 +57,7 @@ async def handle_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     pending_items = context.user_data.get("pending_items")
     if not pending_items:
         await query.edit_message_text(
-            locale.CANCELLED, parse_mode=ParseMode.HTML
+            fmt(locale.CANCELLED, update), parse_mode=ParseMode.HTML
         )
         _clear_pending(context)
         return IDLE
@@ -129,7 +129,7 @@ async def handle_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         f"{locale.CALCULATION_HEADER}\n\n"
         f"{table}\n\n"
         f"{summary}\n\n"
-        f"{locale.CALCULATION_SAVED}\n"
+        f"{fmt(locale.CALCULATION_SAVED, update)}\n"
         f"{daily_summary}"
     )
 
@@ -171,7 +171,7 @@ async def handle_correction_text(
     pending_items = context.user_data.get("pending_items")
     if not pending_items:
         await update.message.reply_text(
-            locale.CANCELLED, parse_mode=ParseMode.HTML
+            fmt(locale.CANCELLED, update), parse_mode=ParseMode.HTML
         )
         _clear_pending(context)
         return IDLE
@@ -180,7 +180,7 @@ async def handle_correction_text(
     pending_photo_bytes = context.user_data.get("pending_photo_bytes")
 
     status_msg = await update.message.reply_text(
-        locale.ANALYZING, parse_mode=ParseMode.HTML
+        fmt(locale.ANALYZING, update), parse_mode=ParseMode.HTML
     )
 
     try:

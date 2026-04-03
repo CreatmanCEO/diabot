@@ -7,7 +7,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 from locales import get_locale
-from handlers import IDLE, AWAITING_CONFIRM
+from handlers import IDLE, AWAITING_CONFIRM, fmt
 from handlers.keyboards import confirm_keyboard
 from services.nutrition import format_recognition
 
@@ -50,7 +50,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     if not allowed:
         minutes = max(1, wait_seconds // 60)
         await update.message.reply_text(
-            locale.RATE_LIMITED.format(minutes=minutes),
+            fmt(locale.RATE_LIMITED, update, minutes=minutes),
             parse_mode=ParseMode.HTML,
         )
         return IDLE
@@ -60,7 +60,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     caption = update.message.caption
 
     status_msg = await update.message.reply_text(
-        locale.ANALYZING, parse_mode=ParseMode.HTML
+        fmt(locale.ANALYZING, update), parse_mode=ParseMode.HTML
     )
 
     try:
@@ -79,7 +79,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 
     if not result.is_food:
         await status_msg.edit_text(
-            locale.RECOGNITION_NO_FOOD, parse_mode=ParseMode.HTML
+            fmt(locale.RECOGNITION_NO_FOOD, update), parse_mode=ParseMode.HTML
         )
         return IDLE
 
@@ -95,7 +95,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
 
     text = format_recognition(
         result,
-        header=locale.RECOGNITION_HEADER,
+        header=fmt(locale.RECOGNITION_HEADER, update),
         confirm_msg=locale.RECOGNITION_CONFIRM,
         no_food_msg=locale.RECOGNITION_NO_FOOD,
     )
