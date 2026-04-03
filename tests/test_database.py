@@ -157,3 +157,43 @@ async def test_meals_history(db):
         await db.save_meal(user_id=123, date=f"2026-04-{i+1:02d}", items_json=items, totals_json=totals)
     history = await db.get_meals_history(123, limit=3)
     assert len(history) == 3
+
+
+@pytest.mark.asyncio
+async def test_user_profile_fields(db):
+    await db.create_user(user_id=123)
+    await db.update_user(123, gender="female", height_cm=165, weight_kg=58.0, age=27)
+    user = await db.get_user(123)
+    assert user.gender == "female"
+    assert user.height_cm == 165
+    assert user.weight_kg == 58.0
+    assert user.age == 27
+
+
+@pytest.mark.asyncio
+async def test_user_target_fields(db):
+    await db.create_user(user_id=123)
+    await db.update_user(123, target_calories=1800, target_protein=65, target_fat=60, target_carbs=225)
+    user = await db.get_user(123)
+    assert user.target_calories == 1800
+    assert user.target_carbs == 225
+
+
+@pytest.mark.asyncio
+async def test_get_day_totals(db):
+    await db.create_user(user_id=123)
+    import json
+    totals1 = json.dumps({"calories": 287, "protein": 8.2, "fat": 5.1, "carbs": 52.3, "fiber": 2.0, "he": 4.0})
+    totals2 = json.dumps({"calories": 452, "protein": 45.0, "fat": 4.5, "carbs": 58.3, "fiber": 3.0, "he": 4.4})
+    await db.save_meal(user_id=123, date="2026-04-03", items_json="[]", totals_json=totals1)
+    await db.save_meal(user_id=123, date="2026-04-03", items_json="[]", totals_json=totals2)
+    day = await db.get_day_totals(123, "2026-04-03")
+    assert day["calories"] == 739
+    assert abs(day["he"] - 8.4) < 0.01
+
+
+@pytest.mark.asyncio
+async def test_get_day_totals_empty(db):
+    await db.create_user(user_id=123)
+    day = await db.get_day_totals(123, "2026-04-03")
+    assert day["calories"] == 0

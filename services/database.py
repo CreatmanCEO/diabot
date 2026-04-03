@@ -19,6 +19,7 @@ class Database:
         self._db = await aiosqlite.connect(self.db_path)
         self._db.row_factory = aiosqlite.Row
         await self._create_tables()
+        await self._migrate_tables()
 
     async def close(self) -> None:
         """Close database connection."""
@@ -37,7 +38,15 @@ class Database:
                 is_active BOOLEAN DEFAULT 1,
                 onboarding_completed BOOLEAN DEFAULT 0,
                 consent_given_at TEXT,
-                created_at TEXT DEFAULT (datetime('now'))
+                created_at TEXT DEFAULT (datetime('now')),
+                gender TEXT,
+                height_cm INTEGER,
+                weight_kg REAL,
+                age INTEGER,
+                target_calories INTEGER,
+                target_protein INTEGER,
+                target_fat INTEGER,
+                target_carbs INTEGER
             );
 
             CREATE TABLE IF NOT EXISTS meals (
@@ -74,6 +83,27 @@ class Database:
         """)
         await self._db.commit()
 
+    async def _migrate_tables(self) -> None:
+        """Add new columns to existing tables (safe if already exist)."""
+        new_columns = [
+            ("users", "gender", "TEXT"),
+            ("users", "height_cm", "INTEGER"),
+            ("users", "weight_kg", "REAL"),
+            ("users", "age", "INTEGER"),
+            ("users", "target_calories", "INTEGER"),
+            ("users", "target_protein", "INTEGER"),
+            ("users", "target_fat", "INTEGER"),
+            ("users", "target_carbs", "INTEGER"),
+        ]
+        for table, column, col_type in new_columns:
+            try:
+                await self._db.execute(
+                    f"ALTER TABLE {table} ADD COLUMN {column} {col_type}"
+                )
+            except Exception:
+                pass  # Column already exists
+        await self._db.commit()
+
     # --- Users ---
 
     async def create_user(self, user_id: int, username: str | None = None) -> None:
@@ -102,6 +132,14 @@ class Database:
             onboarding_completed=bool(row["onboarding_completed"]),
             consent_given_at=row["consent_given_at"],
             created_at=row["created_at"],
+            gender=row["gender"],
+            height_cm=row["height_cm"],
+            weight_kg=row["weight_kg"] if row["weight_kg"] is not None else None,
+            age=row["age"],
+            target_calories=row["target_calories"],
+            target_protein=row["target_protein"],
+            target_fat=row["target_fat"],
+            target_carbs=row["target_carbs"],
         )
 
     async def update_user(self, user_id: int, **kwargs) -> None:
@@ -172,6 +210,17 @@ class Database:
         )
         rows = await cursor.fetchall()
         return [dict(row) for row in rows]
+
+    async def get_day_totals(self, user_id: int, date: str) -> dict:
+        """Get aggregated nutrition totals for a day."""
+        import json as _json
+        meals = await self.get_meals_by_date(user_id, date)
+        totals = {"calories": 0, "protein": 0, "fat": 0, "carbs": 0, "fiber": 0, "he": 0}
+        for meal in meals:
+            mt = _json.loads(meal.get("totals_json", "{}"))
+            for key in totals:
+                totals[key] += mt.get(key, 0)
+        return totals
 
     async def delete_last_meal(self, user_id: int) -> bool:
         """Delete the most recent meal. Returns True if a meal was deleted."""
