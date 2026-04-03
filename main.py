@@ -55,6 +55,7 @@ from handlers.privacy import (
     handle_delete_data,
     handle_delete_confirm,
 )
+from handlers.settings import handle_settings_callback, handle_targets_setup_callback
 from services.database import Database
 from services.llm import LLMService
 from services.auth import AuthService
@@ -154,6 +155,8 @@ def main() -> None:
                 CommandHandler("removeuser", handle_removeuser),
                 CommandHandler("listusers", handle_listusers),
                 CallbackQueryHandler(handle_delete_confirm, pattern="^delete_"),
+                CallbackQueryHandler(handle_settings_callback, pattern="^settings_"),
+                CallbackQueryHandler(handle_targets_setup_callback, pattern="^targets_setup_"),
             ],
             # Awaiting food confirmation
             AWAITING_CONFIRM: [

@@ -12,6 +12,7 @@ from handlers.keyboards import confirm_keyboard, main_keyboard, settings_keyboar
 from handlers.diary import handle_today, handle_week, handle_history, handle_undo
 from handlers.glucose import handle_sugar_button
 from handlers.privacy import handle_privacy
+from handlers.settings import handle_settings, handle_targets_text_edit
 from services.nutrition import format_recognition
 
 logger = logging.getLogger(__name__)
@@ -55,12 +56,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
         return await handle_sugar_button(update, context)
 
     if text == locale.BTN_MENU:
-        await update.message.reply_text(
-            fmt(locale.HELP_TEXT, update),
-            parse_mode=ParseMode.HTML,
-            reply_markup=settings_keyboard(locale),
-        )
-        return IDLE
+        return await handle_settings(update, context)
 
     if text == locale.BTN_HISTORY:
         return await handle_history(update, context)
@@ -86,6 +82,11 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int
             reply_markup=main_keyboard(locale),
         )
         return IDLE
+
+    # Check if user is editing targets from settings
+    result = await handle_targets_text_edit(update, context)
+    if result is not None:
+        return result
 
     # Not a button — treat as food description
     if not await check_access(update, context):
