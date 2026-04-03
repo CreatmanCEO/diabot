@@ -53,7 +53,14 @@ class RecognitionResult:
 
     @classmethod
     def from_dict(cls, data: dict) -> RecognitionResult:
-        items = [MealItem(**item) for item in data.get("items", [])]
+        items = []
+        for item in data.get("items", []):
+            # Filter to only known MealItem fields — LLM may return extras
+            items.append(MealItem(
+                name=item.get("name", ""),
+                weight_g=item.get("weight_g", item.get("volume_ml", 0)),
+                note=item.get("note", ""),
+            ))
         return cls(
             items=items,
             is_food=data.get("is_food", False),
@@ -70,8 +77,31 @@ class CalculationResult:
 
     @classmethod
     def from_dict(cls, data: dict) -> CalculationResult:
-        items = [NutritionItem(**item) for item in data.get("items", [])]
-        totals = NutritionTotals(**data.get("totals", {}))
+        items = []
+        for item in data.get("items", []):
+            # Filter to known NutritionItem fields — LLM may return extras
+            items.append(NutritionItem(
+                name=item.get("name", ""),
+                weight_g=item.get("weight_g", item.get("volume_ml", 0)),
+                calories=item.get("calories", 0),
+                protein=item.get("protein", 0),
+                fat=item.get("fat", 0),
+                carbs=item.get("carbs", 0),
+                fiber=item.get("fiber", 0),
+                gi=item.get("gi", "medium"),
+                source=item.get("source", ""),
+            ))
+        totals_data = data.get("totals", {})
+        totals = NutritionTotals(
+            calories=totals_data.get("calories", 0),
+            protein=totals_data.get("protein", 0),
+            fat=totals_data.get("fat", 0),
+            carbs=totals_data.get("carbs", 0),
+            fiber=totals_data.get("fiber", 0),
+            net_carbs=totals_data.get("net_carbs", 0),
+            he=totals_data.get("he", 0),
+            gi_overall=totals_data.get("gi_overall", "medium"),
+        )
         return cls(items=items, totals=totals)
 
 
