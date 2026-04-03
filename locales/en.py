@@ -238,3 +238,64 @@ RESPONSE FORMAT (strictly JSON):
 }
 
 IMPORTANT: All text values (name, note) MUST be in English language."""
+
+# --- Onboarding profile ---
+ONBOARDING_GENDER = "👤 {name}, what's your gender?"
+GENDER_FEMALE = "👩 Female"
+GENDER_MALE = "👨 Male"
+ONBOARDING_HEIGHT = "📏 What's your height (cm)?"
+HEIGHT_155 = "155"
+HEIGHT_160 = "160"
+HEIGHT_165 = "165"
+HEIGHT_170 = "170"
+HEIGHT_175 = "175"
+HEIGHT_OTHER = "Other"
+ONBOARDING_WEIGHT = "⚖️ {name}, enter your weight in kg:"
+ONBOARDING_AGE = "🎂 How old are you?"
+ONBOARDING_TARGETS_SHOW = (
+    "📊 {name}, based on your data, your daily targets:\n\n"
+    "  Calories: {calories} kcal\n"
+    "  Protein: {protein} g\n"
+    "  Fat: {fat} g\n"
+    "  Carbs: {carbs} g ({he} XE)\n\n"
+    "All correct?"
+)
+TARGETS_CONFIRM = "✅ Confirm"
+TARGETS_EDIT = "✏️ Edit"
+ONBOARDING_TARGETS_EDIT = (
+    "Enter your targets in format:\n"
+    "<code>calories protein fat carbs</code>\n"
+    "Example: <code>1800 65 60 225</code>"
+)
+ONBOARDING_TARGETS_INVALID = "⚠️ Enter 4 numbers separated by spaces: calories protein fat carbs"
+ONBOARDING_HEIGHT_CUSTOM = "Enter your height in cm (number):"
+ONBOARDING_WEIGHT_INVALID = "⚠️ Enter weight as a number, e.g.: 58 or 58.5"
+ONBOARDING_AGE_INVALID = "⚠️ Enter age as a number, e.g.: 27"
+
+# --- Settings ---
+BTN_SETTINGS = "⚙️ Settings"
+SETTINGS_HEADER = (
+    "⚙️ <b>Settings</b>\n\n"
+    "Timezone: {timezone}\n"
+    "XE: {he_grams} g\n"
+    "Gender: {gender} | Height: {height} | Weight: {weight} | Age: {age}\n\n"
+    "<b>Daily targets:</b>\n"
+    "  Calories: {calories} kcal\n"
+    "  Protein: {protein} g\n"
+    "  Fat: {fat} g\n"
+    "  Carbs: {carbs} g"
+)
+SETTINGS_EDIT_TARGETS = "✏️ Edit targets"
+SETTINGS_EDIT_PROFILE = "📏 Edit profile"
+SETTINGS_SAVED = "✅ Settings saved!"
+GENDER_DISPLAY_MALE = "Male"
+GENDER_DISPLAY_FEMALE = "Female"
+GENDER_DISPLAY_NONE = "—"
+
+# --- Migration prompt ---
+TARGETS_SETUP_PROMPT = (
+    "{name}, I've added daily target tracking!\n"
+    "Want to set up? Takes a minute."
+)
+TARGETS_SETUP_NOW = "📏 Set up"
+TARGETS_SETUP_LATER = "⏭ Later"

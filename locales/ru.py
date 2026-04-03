@@ -239,3 +239,64 @@ RESPONSE FORMAT (strictly JSON):
 }
 
 IMPORTANT: All text values (name, note) MUST be in Русский language."""
+
+# --- Onboarding profile ---
+ONBOARDING_GENDER = "👤 {name}, какой у тебя пол?"
+GENDER_FEMALE = "👩 Женский"
+GENDER_MALE = "👨 Мужской"
+ONBOARDING_HEIGHT = "📏 Какой у тебя рост (см)?"
+HEIGHT_155 = "155"
+HEIGHT_160 = "160"
+HEIGHT_165 = "165"
+HEIGHT_170 = "170"
+HEIGHT_175 = "175"
+HEIGHT_OTHER = "Другой"
+ONBOARDING_WEIGHT = "⚖️ {name}, введи свой вес в кг:"
+ONBOARDING_AGE = "🎂 Сколько тебе лет?"
+ONBOARDING_TARGETS_SHOW = (
+    "📊 {name}, на основе твоих данных, твои суточные нормы:\n\n"
+    "  Калории: {calories} ккал\n"
+    "  Белок: {protein} г\n"
+    "  Жиры: {fat} г\n"
+    "  Углеводы: {carbs} г ({he} ХЕ)\n\n"
+    "Всё верно?"
+)
+TARGETS_CONFIRM = "✅ Подтвердить"
+TARGETS_EDIT = "✏️ Изменить"
+ONBOARDING_TARGETS_EDIT = (
+    "Введи свои нормы в формате:\n"
+    "<code>калории белок жиры углеводы</code>\n"
+    "Например: <code>1800 65 60 225</code>"
+)
+ONBOARDING_TARGETS_INVALID = "⚠️ Введи 4 числа через пробел: калории белок жиры углеводы"
+ONBOARDING_HEIGHT_CUSTOM = "Введи свой рост в см (число):"
+ONBOARDING_WEIGHT_INVALID = "⚠️ Введи вес числом, например: 58 или 58.5"
+ONBOARDING_AGE_INVALID = "⚠️ Введи возраст числом, например: 27"
+
+# --- Settings ---
+BTN_SETTINGS = "⚙️ Настройки"
+SETTINGS_HEADER = (
+    "⚙️ <b>Настройки</b>\n\n"
+    "Часовой пояс: {timezone}\n"
+    "ХЕ: {he_grams} г\n"
+    "Пол: {gender} | Рост: {height} | Вес: {weight} | Возраст: {age}\n\n"
+    "<b>Суточные нормы:</b>\n"
+    "  Калории: {calories} ккал\n"
+    "  Белок: {protein} г\n"
+    "  Жиры: {fat} г\n"
+    "  Углеводы: {carbs} г"
+)
+SETTINGS_EDIT_TARGETS = "✏️ Изменить нормы"
+SETTINGS_EDIT_PROFILE = "📏 Изменить данные"
+SETTINGS_SAVED = "✅ Настройки сохранены!"
+GENDER_DISPLAY_MALE = "Муж"
+GENDER_DISPLAY_FEMALE = "Жен"
+GENDER_DISPLAY_NONE = "—"
+
+# --- Migration prompt ---
+TARGETS_SETUP_PROMPT = (
+    "{name}, я добавил отслеживание суточных норм!\n"
+    "Хочешь настроить? Это займёт минуту."
+)
+TARGETS_SETUP_NOW = "📏 Настроить"
+TARGETS_SETUP_LATER = "⏭ Потом"
