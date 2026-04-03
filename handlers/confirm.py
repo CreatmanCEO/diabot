@@ -66,7 +66,7 @@ async def handle_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await query.edit_message_reply_markup(reply_markup=None)
 
     try:
-        calc_prompt = locale.CALCULATION_PROMPT.format(he_grams=user.he_grams)
+        calc_prompt = locale.CALCULATION_PROMPT.replace("{he_grams}", str(user.he_grams))
         result = await llm.calculate_nutrition(pending_items, calc_prompt)
     except Exception:
         logger.exception("Nutrition calculation failed")

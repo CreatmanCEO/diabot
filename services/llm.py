@@ -128,9 +128,10 @@ class LLMService:
     ) -> RecognitionResult:
         """Apply user correction to previous recognition."""
         # Format prompt with previous items and correction
-        formatted_prompt = prompt.format(
-            previous_items=json.dumps(previous_items, ensure_ascii=False),
-            correction_text=correction,
+        formatted_prompt = (
+            prompt
+            .replace("{previous_items}", json.dumps(previous_items, ensure_ascii=False))
+            .replace("{correction_text}", correction)
         )
 
         if image_bytes:
