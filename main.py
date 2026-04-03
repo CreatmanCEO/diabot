@@ -18,6 +18,11 @@ from handlers import (
     ONBOARDING_CONSENT,
     ONBOARDING_TIMEZONE,
     ONBOARDING_HE,
+    ONBOARDING_GENDER,
+    ONBOARDING_HEIGHT,
+    ONBOARDING_WEIGHT,
+    ONBOARDING_AGE,
+    ONBOARDING_TARGETS_CONFIRM,
     IDLE,
     AWAITING_CONFIRM,
     AWAITING_GLUCOSE,
@@ -30,6 +35,13 @@ from handlers.start import (
     handle_he_callback,
     handle_he_text,
     handle_help,
+    handle_gender_callback,
+    handle_height_callback,
+    handle_height_text,
+    handle_weight_text,
+    handle_age_text,
+    handle_targets_confirm_callback,
+    handle_targets_edit_text,
 )
 from handlers.photo import handle_photo
 from handlers.text import handle_text
@@ -107,6 +119,23 @@ def main() -> None:
             ONBOARDING_HE: [
                 CallbackQueryHandler(handle_he_callback, pattern="^he_"),
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_he_text),
+            ],
+            ONBOARDING_GENDER: [
+                CallbackQueryHandler(handle_gender_callback, pattern="^gender_"),
+            ],
+            ONBOARDING_HEIGHT: [
+                CallbackQueryHandler(handle_height_callback, pattern="^height_"),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_height_text),
+            ],
+            ONBOARDING_WEIGHT: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_weight_text),
+            ],
+            ONBOARDING_AGE: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_age_text),
+            ],
+            ONBOARDING_TARGETS_CONFIRM: [
+                CallbackQueryHandler(handle_targets_confirm_callback, pattern="^targets_"),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_targets_edit_text),
             ],
             # Main idle state
             IDLE: [

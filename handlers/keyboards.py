@@ -77,3 +77,56 @@ def delete_confirm_keyboard(locale) -> InlineKeyboardMarkup:
         ]
     ]
     return InlineKeyboardMarkup(keyboard)
+
+
+def gender_keyboard(locale) -> InlineKeyboardMarkup:
+    """Inline gender selection keyboard."""
+    keyboard = [[
+        InlineKeyboardButton(locale.GENDER_FEMALE, callback_data="gender_female"),
+        InlineKeyboardButton(locale.GENDER_MALE, callback_data="gender_male"),
+    ]]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def height_keyboard(locale) -> InlineKeyboardMarkup:
+    """Inline height selection keyboard."""
+    keyboard = [
+        [
+            InlineKeyboardButton(locale.HEIGHT_155, callback_data="height_155"),
+            InlineKeyboardButton(locale.HEIGHT_160, callback_data="height_160"),
+            InlineKeyboardButton(locale.HEIGHT_165, callback_data="height_165"),
+        ],
+        [
+            InlineKeyboardButton(locale.HEIGHT_170, callback_data="height_170"),
+            InlineKeyboardButton(locale.HEIGHT_175, callback_data="height_175"),
+            InlineKeyboardButton(locale.HEIGHT_OTHER, callback_data="height_custom"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def targets_confirm_keyboard(locale) -> InlineKeyboardMarkup:
+    """Inline targets confirmation keyboard."""
+    keyboard = [[
+        InlineKeyboardButton(locale.TARGETS_CONFIRM, callback_data="targets_confirm"),
+        InlineKeyboardButton(locale.TARGETS_EDIT, callback_data="targets_edit"),
+    ]]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def settings_keyboard_inline(locale) -> InlineKeyboardMarkup:
+    """Inline settings action keyboard."""
+    keyboard = [[
+        InlineKeyboardButton(locale.SETTINGS_EDIT_TARGETS, callback_data="settings_targets"),
+        InlineKeyboardButton(locale.SETTINGS_EDIT_PROFILE, callback_data="settings_profile"),
+    ]]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def targets_setup_keyboard(locale) -> InlineKeyboardMarkup:
+    """Inline targets setup prompt keyboard for migration."""
+    keyboard = [[
+        InlineKeyboardButton(locale.TARGETS_SETUP_NOW, callback_data="targets_setup_now"),
+        InlineKeyboardButton(locale.TARGETS_SETUP_LATER, callback_data="targets_setup_later"),
+    ]]
+    return InlineKeyboardMarkup(keyboard)
