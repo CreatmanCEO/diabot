@@ -257,8 +257,15 @@ Previous recognition result:
 
 User's correction: {correction_text}
 
-Apply the user's correction to the list. Add, remove, or modify items as requested.
-Keep unchanged items as they are. Re-estimate weights if the correction implies a change.
+RULES:
+1. Apply the user's correction to the existing list
+2. Add, remove, or modify items as requested
+3. Keep unchanged items as they are
+4. Re-estimate weights if the correction implies a change
+5. If user says they ate less — reduce the weight, don't remove the item
+6. If user says they didn't eat something — remove only that item
+7. is_food MUST ALWAYS be true (this is a correction of an existing food list)
+8. confidence should be "high" since user is providing direct corrections
 
 RESPONSE FORMAT (strictly JSON):
 {
@@ -269,7 +276,7 @@ RESPONSE FORMAT (strictly JSON):
   "confidence": "high"
 }
 
-IMPORTANT: All text values (name, note) MUST be in English language."""
+IMPORTANT: is_food must ALWAYS be true. All text values (name, note) MUST be in English language."""
 
 # --- Onboarding profile ---
 ONBOARDING_GENDER = "👤 {name}, what's your gender?"

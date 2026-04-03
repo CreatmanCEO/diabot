@@ -12,7 +12,7 @@ from telegram.ext import ContextTypes
 from locales import get_locale
 from handlers import IDLE, AWAITING_CONFIRM, fmt
 from handlers.keyboards import confirm_keyboard, main_keyboard
-from models.schemas import RecognitionResult
+from models.schemas import MealItem, RecognitionResult
 from services.nutrition import (
     format_recognition,
     format_calculation,
@@ -211,6 +211,11 @@ async def handle_correction_text(
             locale.SERVICE_UNAVAILABLE, parse_mode=ParseMode.HTML
         )
         return AWAITING_CONFIRM
+
+    # Correction should always be food — fall back to original items if LLM gets confused
+    if not result.is_food or not result.items:
+        result.is_food = True
+        result.items = [MealItem(**item) for item in pending_items]
 
     # Update pending items
     context.user_data["pending_items"] = [
