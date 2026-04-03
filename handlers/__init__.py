@@ -1,0 +1,9 @@
+"""Telegram bot handlers."""
+
+# ConversationHandler states
+ONBOARDING_CONSENT = 0
+ONBOARDING_TIMEZONE = 1
+ONBOARDING_HE = 2
+IDLE = 3
+AWAITING_CONFIRM = 4
+AWAITING_GLUCOSE = 5
