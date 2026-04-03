@@ -1,47 +1,82 @@
 # CLAUDE.md
 
-## О проекте
+## About
 
-DiaBot — персональный Telegram-бот для человека с диабетом 1 типа. Фото еды → распознавание через Gemini AI → подтверждение пользователем → расчёт КБЖУ и ХЕ → запись в дневник. Бот для одного пользователя.
+DiaBot — open-source Telegram bot for people with type 1 diabetes. Food photo → AI recognition → user confirmation → KBJU/XE calculation → food diary. Multi-user, self-hosted, i18n-ready.
 
-## Стек
+## Tech Stack
 
-- Python 3.11+, полный async/await
-- `python-telegram-bot` (async, polling mode)
-- `google-genai` (НЕ google-generativeai, НЕ vertexai) — Gemini 2.5 Flash
-- `aiosqlite` — SQLite без ORM, простые SQL запросы
-- `python-dotenv` — конфигурация через .env
+- Python 3.11+, full async/await
+- `python-telegram-bot` 21+ (async, polling mode)
+- `litellm` — multi-provider LLM routing (Gemini → OpenRouter → Groq)
+- `google-genai` — Google Search grounding fallback for unknown products
+- `aiosqlite` — SQLite, no ORM, plain SQL
+- `python-dotenv` — configuration via .env
 
-## Команды
+## Commands
 
 - Run: `python main.py`
-- Install deps: `pip install -r requirements.txt`
-- No test framework yet
+- Test: `python -m pytest tests/ -v`
+- Install: `pip install -r requirements.txt`
 
-## Стиль кода
+## Code Style
 
-- Type hints везде
-- Docstrings для публичных функций
-- Logging через модуль `logging` (INFO — действия, DEBUG — Gemini запросы/ответы)
-- Никаких хардкод-строк — тексты сообщений в константах
-- HTML parse mode для Telegram (не Markdown)
-- JSON mode для Gemini (`response_mime_type: "application/json"`)
+- All code, comments, docstrings in **English**
+- Type hints everywhere
+- Docstrings for public functions
+- Logging via `logging` module (INFO for actions, DEBUG for LLM requests)
+- No hardcoded strings — all bot messages in `locales/` modules
+- HTML parse_mode for Telegram (not Markdown)
+- JSON mode for LLM responses (`response_format: json_object`)
 
-## Архитектура
+## Architecture
 
-- `handlers/` — Telegram хендлеры (start, photo, text, confirm, diary)
-- `services/` — бизнес-логика (gemini, nutrition, database)
-- `models/` — dataclasses/TypedDict
-- `prompts/` — системные промпты для Gemini
-- ConversationHandler с состояниями: IDLE → AWAITING_CONFIRM → IDLE
-- Состояние в `context.user_data`
+```
+main.py                    # Entry point, ConversationHandler wiring
+config.py                  # Settings dataclass from .env
+handlers/                  # Telegram handlers (thin, I/O only)
+  start.py                 # /start, onboarding, /help
+  photo.py                 # Food photo recognition
+  text.py                  # Text food description + button routing
+  confirm.py               # Confirmation, cancellation, corrections
+  diary.py                 # /today, /week, /history, /undo
+  glucose.py               # /sugar, glucose readings
+  admin.py                 # /adduser, /removeuser, /listusers
+  privacy.py               # /privacy, /export, /delete_my_data
+  keyboards.py             # Keyboard factory functions
+services/                  # Business logic
+  llm.py                   # litellm Router with 2 chains (vision + text)
+  nutrition.py             # KBJU formatting for Telegram
+  database.py              # aiosqlite CRUD (users, meals, glucose)
+  auth.py                  # Access control, rate limiting
+models/schemas.py          # Dataclasses (MealItem, User, etc.)
+locales/                   # i18n strings + LLM prompts
+  ru.py                    # Russian (default)
+  en.py                    # English
+```
 
-## Важно
+## State Machine
 
-- Точность углеводов критичнее калорий — от этого зависит доза инсулина
-- 1 ХЕ = 12 г углеводов (конфигурируемо через HE_GRAMS)
-- Один пользователь (ALLOWED_USER_ID), проверка во всех хендлерах
-- Polling mode (не webhook)
-- Фото не хранить на диске — только Telegram file_id
-- Даты с учётом timezone пользователя
-- Reference-проект: https://github.com/jokkebk/mealgram (вдохновение, не копировать)
+```
+ONBOARDING_CONSENT → ONBOARDING_TIMEZONE → ONBOARDING_HE → IDLE
+IDLE ↔ AWAITING_CONFIRM (food recognition flow)
+IDLE ↔ AWAITING_GLUCOSE (glucose recording)
+```
+
+## Key Decisions
+
+- Services stored in `context.bot_data` (db, llm, auth, settings)
+- 2 LLM chains: vision (Gemini/OpenRouter) and text (+ Groq fallback)
+- Google Search grounding for low-confidence branded products
+- Photos never saved to disk — only Telegram file_id stored
+- Admins from .env (ADMIN_IDS), additional users via /adduser commands
+- User data isolation per user_id in all DB queries
+- Carb accuracy > calorie accuracy (insulin dosing depends on it)
+- 1 XE = 12g carbs default (configurable per user)
+
+## Important
+
+- LLM prompts in `locales/` (not separate prompts/ dir) — tied to language
+- Reply keyboard for main navigation, inline keyboard for confirmation only
+- All dates stored with user's timezone awareness
+- GDPR: /export and /delete_my_data implemented
