@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 520" width="980" height="520" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Helvetica, Arial">
+  <title>DiaBot — recognition pipeline</title>
+  <desc>Pipeline: a Telegram photo or text message arrives, the bot routes it to a vision or text LLM chain, the user confirms or corrects the recognised items, the bot computes carbohydrates / bread units / KBJU, writes the meal to SQLite, and shows daily progress towards targets. Photos never touch disk — only Telegram file_id is stored.</desc>
+
+  <rect x="0" y="0" width="980" height="520" fill="#0d1117"/>
+
+  <text x="490" y="32" text-anchor="middle" font-size="18" fill="#e6edf3" font-weight="600">DiaBot — recognition pipeline</text>
+  <text x="490" y="52" text-anchor="middle" font-size="12" fill="#7d8590">Photo never touches disk · two-step confirm · carbs prioritised over calories · multi-provider LLM with auto-failover</text>
+
+  <!-- User input -->
+  <rect x="40" y="84" width="200" height="56" rx="10" fill="#1f2937" stroke="#cc785c"/>
+  <text x="140" y="106" text-anchor="middle" font-size="13" fill="#cc785c" font-weight="700">Telegram</text>
+  <text x="140" y="124" text-anchor="middle" font-size="11" fill="#9ca3af">photo · text · /commands</text>
+
+  <!-- arrow -->
+  <line x1="240" y1="112" x2="288" y2="112" stroke="#4b5563" stroke-width="2"/>
+  <polygon points="296,112 284,106 284,118" fill="#4b5563"/>
+
+  <!-- Handler layer -->
+  <rect x="296" y="84" width="240" height="56" rx="10" fill="#1f2937" stroke="#3b9eff"/>
+  <text x="416" y="106" text-anchor="middle" font-size="13" fill="#3b9eff" font-weight="700">handlers/ (thin I/O)</text>
+  <text x="416" y="124" text-anchor="middle" font-size="11" fill="#9ca3af">photo · text · confirm · diary · glucose</text>
+
+  <!-- arrow -->
+  <line x1="536" y1="112" x2="584" y2="112" stroke="#4b5563" stroke-width="2"/>
+  <polygon points="592,112 580,106 580,118" fill="#4b5563"/>
+
+  <!-- LLM router -->
+  <rect x="592" y="84" width="200" height="56" rx="10" fill="#1f2937" stroke="#dcdcaa"/>
+  <text x="692" y="106" text-anchor="middle" font-size="13" fill="#dcdcaa" font-weight="700">services/llm.py</text>
+  <text x="692" y="124" text-anchor="middle" font-size="11" fill="#9ca3af">litellm Router · 2 chains · failover</text>
+
+  <!-- Two LLM chains box -->
+  <rect x="40" y="172" width="752" height="100" rx="10" fill="#161b22" stroke="#9d6cff"/>
+  <text x="416" y="194" text-anchor="middle" font-size="12" fill="#9d6cff" font-weight="700">Two LLM chains (auto-failover via litellm Router)</text>
+
+  <rect x="64" y="208" width="340" height="50" rx="6" fill="#1f2937" stroke="#27c93f"/>
+  <text x="234" y="226" text-anchor="middle" font-size="11" fill="#27c93f" font-weight="700">Vision chain (food photo)</text>
+  <text x="234" y="246" text-anchor="middle" font-size="10" fill="#d1d5db">Gemini 2.5 Flash → OpenRouter Gemini</text>
+
+  <rect x="428" y="208" width="340" height="50" rx="6" fill="#1f2937" stroke="#3b9eff"/>
+  <text x="598" y="226" text-anchor="middle" font-size="11" fill="#3b9eff" font-weight="700">Text chain (text-only)</text>
+  <text x="598" y="246" text-anchor="middle" font-size="10" fill="#d1d5db">Gemini → OpenRouter → Groq Llama 4</text>
+
+  <!-- Down arrow to confirm -->
+  <line x1="416" y1="272" x2="416" y2="296" stroke="#4b5563" stroke-width="2"/>
+  <polygon points="416,304 410,292 422,292" fill="#4b5563"/>
+
+  <!-- Confirmation gate -->
+  <rect x="200" y="306" width="432" height="60" rx="10" fill="#2a1414" stroke="#ff5f56"/>
+  <text x="416" y="330" text-anchor="middle" font-size="13" fill="#ff5f56" font-weight="700">User confirmation (✅ Верно / ✏ Исправить / ❌ Отмена)</text>
+  <text x="416" y="350" text-anchor="middle" font-size="10" fill="#f4d4d4">safety-critical — insulin dose depends on the carb count below</text>
+
+  <!-- Down to nutrition + DB -->
+  <line x1="416" y1="366" x2="416" y2="390" stroke="#4b5563" stroke-width="2"/>
+  <polygon points="416,398 410,386 422,386" fill="#4b5563"/>
+
+  <!-- Nutrition + DB row -->
+  <rect x="40" y="408" width="368" height="60" rx="10" fill="#1f2937" stroke="#dcdcaa"/>
+  <text x="224" y="432" text-anchor="middle" font-size="12" fill="#dcdcaa" font-weight="700">services/nutrition.py</text>
+  <text x="224" y="452" text-anchor="middle" font-size="10" fill="#d1d5db">KBJU · bread units (XE) · GI · daily targets · progress bars</text>
+
+  <rect x="424" y="408" width="368" height="60" rx="10" fill="#1f2937" stroke="#3b9eff"/>
+  <text x="608" y="432" text-anchor="middle" font-size="12" fill="#3b9eff" font-weight="700">services/database.py · aiosqlite</text>
+  <text x="608" y="452" text-anchor="middle" font-size="10" fill="#d1d5db">users · meals · glucose · targets · timezone-aware</text>
+
+  <!-- Side: Search grounding -->
+  <rect x="808" y="84" width="140" height="186" rx="10" fill="#1f2937" stroke="#cc785c" stroke-dasharray="3 3"/>
+  <text x="878" y="106" text-anchor="middle" font-size="11" fill="#cc785c" font-weight="700">grounding (low</text>
+  <text x="878" y="120" text-anchor="middle" font-size="11" fill="#cc785c" font-weight="700">confidence)</text>
+  <text x="878" y="146" text-anchor="middle" font-size="10" fill="#d1d5db">google-genai</text>
+  <text x="878" y="160" text-anchor="middle" font-size="10" fill="#d1d5db">+ Search tool</text>
+  <text x="878" y="184" text-anchor="middle" font-size="10" fill="#7d8590">branded</text>
+  <text x="878" y="198" text-anchor="middle" font-size="10" fill="#7d8590">products</text>
+  <text x="878" y="212" text-anchor="middle" font-size="10" fill="#7d8590">resolution</text>
+  <text x="878" y="244" text-anchor="middle" font-size="9" fill="#7d8590">→ KBJU lookup</text>
+
+  <!-- Footer disclaimers -->
+  <text x="490" y="496" text-anchor="middle" font-size="11" fill="#7d8590">Photos never saved to disk · only Telegram file_id stored · bytes streamed to LLM and discarded · GDPR-style /export and /delete_my_data</text>
+</svg>
