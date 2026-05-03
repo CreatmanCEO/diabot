@@ -47,7 +47,6 @@ jobs:
           GEMINI_API_KEY: dummy
           OPENROUTER_API_KEY: dummy
           GROQ_API_KEY: dummy
-          DB_PATH: /tmp/diabot-test.db
         run: python -m pytest tests/ -v --tb=short
 
       - name: SVG files are well-formed XML
